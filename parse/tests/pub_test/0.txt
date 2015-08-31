@@ -1,0 +1,19 @@
+          Title TESTING_TITLE0
+            URL TESTING_URL0
+           Year 2000
+      Citations 0
+       Versions 1
+     Cluster ID 1613924578938524769
+ Citations list CITATIONS_LIST0
+  Versions list VERSION_LIST0
+    Author line PER SON - SCIENCE
+
+          Title TESTING_TITLE1
+            URL TESTING_URL1
+           Year 2001
+      Citations 321
+       Versions 13
+     Cluster ID 16259048495598541056
+ Citations list CITATIONS_LIST1
+  Versions list VERSION_LIST1
+    Author line SF Way, PER SON - NATURE
