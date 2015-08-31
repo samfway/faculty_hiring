@@ -83,11 +83,18 @@ def parse_institution_records(fp):
     ''' VARIATION #1: `pi_inv' - Inverse of the pi ranking. Lower ranks yield larger numbers. ''' 
     for i in institutions:
         institutions[i]['pi_inv'] = 1. / institutions[i].get('pi', worst_ranking)
+    
 
     ''' VARIATION #2: `pi_rescaled' - Rescaled such that the best school gets 1.0
                                       and the rest get some epsilon value. ''' 
     for i in institutions:
         institutions[i]['pi_rescaled'] = scale(institutions[i].get('pi', worst_ranking))
+
+
+    # Fill in defaults
+    institutions['UNKNOWN']['pi'] = worst_ranking
+    institutions['UNKNOWN']['pi_inv'] = 1./worst_ranking
+    institutions['UNKNOWN']['pi_rescaled'] = scale(worst_ranking)
 
     return institutions 
 
