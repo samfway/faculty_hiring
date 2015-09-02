@@ -31,7 +31,7 @@ class ConfigurationModel:
     def __init__(self):
         pass
     
-    def simulate_hiring(self, candidates, positions, school_info, ranking='pi_inv'):
+    def simulate_hiring(self, candidates, positions, school_info, **kwargs):
         """ All candidates have an equal chance of being hired to each job """ 
         random_candidates = np.random.permutation(candidates)
         return zip(random_candidates, positions)
@@ -44,7 +44,7 @@ class BestFirstModel:
     def __init__(self):
         pass
 
-    def simulate_hiring(self, candidates, positions, school_info, ranking='pi_inv'):
+    def simulate_hiring(self, candidates, positions, school_info, **kwargs):
         """ Simulate faculty hiring under the 'best-first' model.
             Under this model, the highest-ranked job is filled first,
             and they blindly pick the candidate from the highest-ranked
@@ -56,6 +56,7 @@ class BestFirstModel:
             Haven't heard of that school? We'll assume the hiring committee hasn't either, 
             and you get no bonus points for prestige.
         """
+        ranking = kwargs.get('ranking', 'pi_inv')
         worst_ranking = school_info['UNKNOWN'][ranking]
 
         # Populate list of available candidates
@@ -96,7 +97,7 @@ class StepFunctionModel
     def __init__(self):
         pass
 
-    def simulate_hiring(self, candidates, positions, school_info, ranking='pi_inv', power=1):
+    def simulate_hiring(self, candidates, positions, school_info, **kwargs):
         """ Simulate faculty hiring under the step function model.
             This model is essentially the configuration model but only for 
             candidates ranked at least as high as the institution making 
@@ -112,6 +113,9 @@ class StepFunctionModel
             probability proportional to the inverse of their rank. The larger the power,
             the more strictly the hiring order resembles the ranks. 
         """
+        ranking = kwargs.get('ranking', 'pi_inv')
+        power = kwargs.get('power', 1)
+
         worst_ranking = school_info['UNKNOWN'][ranking]
         num_jobs = len(positions)
         num_candidates = len(candidates)
