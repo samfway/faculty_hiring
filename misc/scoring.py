@@ -10,19 +10,21 @@ __status__ = "Development"
 """ How to score a hiring simulation
 """
 
-def sse_rank_diff(hires, inst, worst_rank, rank='pi'):
+def sse_rank_diff(hires, inst, ranking='pi'):
     """ Compute the sum of squares rank difference error """
     total = 0.0
     for f, place in hires:
         actual_place, year = f.first_asst_prof()
             
-        actual_rank = worst_rank
-        if actual_place in inst:
-            actual_rank = inst[actual_place][rank]
-                
-        sim_rank = worst_rank
-        if place in inst:
-            sim_rank = inst[place][rank]
+        try:  # Rank where person was actually hired
+            actual_rank = inst[actual_place][ranking]
+        except:
+            actual_rank = inst['UNKNOWN'][ranking]
+
+        try:  # Rank where they were placed in simulation
+            sim_rank = inst[place][ranking]
+        except:
+            sim_rank = inst['UNKNOWN'][ranking]
            
         total += (actual_rank-sim_rank)**2
     return total
