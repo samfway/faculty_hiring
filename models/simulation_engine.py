@@ -9,7 +9,7 @@ __status__ = "Development"
 
 
 import numpy as np
-from university_network.misc.scoring import sse_rank_diff
+from faculty_hiring.misc.scoring import sse_rank_diff
 
 
 class SimulationEngine:
