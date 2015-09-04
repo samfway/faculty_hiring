@@ -54,6 +54,7 @@ Where "EXAMPLE.TXT" contains:
 """
 
 from faculty_hiring.misc.util import Struct
+import numpy as np
 
 NEW_RECORD_SYMBOL = ">>>"
 INDIVIDUAL_FIELDS = ['facultyName', 'email', 'sex', 'department', 
@@ -151,41 +152,53 @@ class faculty_record:
                     self.faculty.append(entry)
                     status = 'ready'
 
+        # Set PhD info
+        self.phd_location = None
+        self.phd_year = None
+        for record in self.education:
+            if record['degree'] == 'PhD':
+                self.phd_location = record['place']
+                self.phd_year = record['end_year']
+
+        # Set first job info - ASSUMES ORDERED RECORDS
+        self.first_job_location = None
+        self.first_job_year = None
+        for record in self.faculty:
+            if record['rank'] != 'PostDoc':
+                self.first_job_location = record['place']
+                self.first_job_year = record['end_year']
+                break 
+
+        # Set Assistant Professor info
+        self.first_asst_job_location = None
+        self.first_asst_job_year = None
+        year = np.inf
+        for record in self.faculty:
+            if record['rank'] == 'Assistant Professor':
+                if record['start_year'] and record['start_year'] < year:
+                    self.first_asst_job_location = record['place']
+                    self.first_asst_job_year = record['start_year']
+
+        # Do they have a post-doc? 
+        self.has_postdoc = False
+        for record in self.faculty:
+            if record['rank'] == 'PostDoc':
+                self.has_postdoc = True
+        
 
     def phd(self):
         """ Return location + year of PhD """
-        for record in self.education:
-            if record['degree'] == 'PhD':
-                return record['place'], record['end_year']
-        return None, None
+        return self.phd_location, self.phd_year
 
 
     def first_job(self):
         """ Return location + year of first non-postdoc job """
-        for record in self.faculty:
-            if record['rank'] != 'PostDoc':
-                return record['place'], record['start_year']
-        return None, None
+        return self.first_job_location, self.first_job_year
 
     
     def first_asst_prof(self):
-        place, year = None, 3000
-        ambig = False
-
-        for record in self.faculty:
-            if record['rank'] == 'Assistant Professor':
-                if record['start_year'] and record['start_year'] < year:
-                    place = record['place']
-                    year = record['start_year']
-                elif not record['start_year']:
-                    ambig = True
-    
-        if place is not None:
-            return place, year
-        else:
-            #if ambig:
-            #    print 'Missing start year!', self['facultyName'], '(%s)' % self['sex']
-            return None, None
+        """ Return location + year of earliest assistant professorship """ 
+        return self.first_asst_job_location, self.first_asst_job_year 
                     
 
     def current_job(self, ignore=['PostDoc', 'Emeritus']):
@@ -251,16 +264,4 @@ def parse_faculty_records(fp):
 
     if partial_record:
         yield faculty_record(temp_buffer)
-
-
-if __name__=="__main__":
-    fp = open('/Users/samway/Documents/Work/ClausetLab/faculty_network/data/allFaculty_BS_CS_HS-shortform_txt/allFaculty_CS_n5762_19-Apr-2012-shortform.txt', 'ru')
-    for x in parse_faculty_records(fp):
-        phd_loc, phd_year = x.phd()
-        job_loc, job_year = x.first_job()
-        
-        if phd_loc is not None and phd_loc != '.' \
-           and job_loc is not None and job_loc != '.':
-            print '%s -> %s' % (phd_loc, job_loc)
-        print x.phd()
 
