@@ -10,6 +10,7 @@ __status__ = "Development"
 
 import argparse
 import numpy as np
+import cProfile
 from faculty_hiring.parse.load import load_hires_by_year
 from faculty_hiring.parse.institution_parser import parse_institution_records
 from faculty_hiring.models.simulation_engine import SimulationEngine
@@ -47,3 +48,4 @@ if __name__=="__main__":
     simulator = SimulationEngine(candidate_pools, job_pools, inst, model, power=2, prob_function='step')
     print 'Step (pow=2):', simulator.simulate()
 
+    cProfile.run('simulator.simulate()')

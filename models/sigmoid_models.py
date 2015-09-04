@@ -53,27 +53,25 @@ class SigmoidModel:
         job_ranks = np.zeros(num_jobs, dtype=float)
         for i, s in enumerate(positions):
             try:
-                rank = school_info[s][ranking]
+                job_ranks[i] = school_info[s][ranking]
             except:
-                rank = worst_ranking
-            job_ranks[i] = rank
+                job_ranks[i] = worst_ranking
 
-        job_ranks = np.array(job_ranks) ** power
-        job_ranks /= job_ranks.sum()  # make probability
+        job_p = job_ranks.copy() ** power
+        job_p /= job_p.sum()  # make probability
 
         # Match candidates to jobs
-        for j in xrange(num_jobs):
+        for j in xrange(num_jobs-1):
             # Select job to fill
-            job_ind = np.random.choice(xrange(num_jobs), p=job_ranks)
-            job_rank = job_ranks[job_ind]  # how much probability mass taken out?
-            if job_rank != 1.:
-                job_ranks /= (1.-job_rank)  # renormalize
-            job_ranks[job_ind] = 0.  # mark as unavailable
+            job_ind = np.random.multinomial(1, job_p).argmax()
+            job_rank = job_ranks[job_ind]
+            job_p[job_ind] = 0.  # mark as unavailable
+            job_p /= np.sum(job_p)  # renormalize
 
             # Match candidate to job
             # Select all of the candidates from a school at least as good as the job
             cand_p = prob_function(candidate_pool, positions[job_ind], job_rank, school_info, **kwargs)
-            cand_ind = np.random.choice(xrange(remaining_candidates), p=cand_p)
+            cand_ind = np.random.multinomial(1, cand_p).argmax()
 
             # Log the hire
             hires.append((candidate_pool[cand_ind][0], positions[job_ind]))
@@ -81,6 +79,8 @@ class SigmoidModel:
             # Remove the candidate from the pool
             del candidate_pool[cand_ind]
             remaining_candidates -= 1 
+
+        job_ind 
     
         return hires
 
@@ -111,7 +111,7 @@ def prob_function_step_function(candidates, inst, inst_rank, school_info, **kwar
     cand_p.fill(1e-9)
     for i, (candidate, candidate_rank) in enumerate(candidates):
         if candidate_rank >= inst_rank:
-            cand_p[i] += 1.
+            cand_p[i] = 1.
     cand_p /= cand_p.sum()
     return cand_p
 
