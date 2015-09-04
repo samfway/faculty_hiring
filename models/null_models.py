@@ -89,86 +89,8 @@ class BestFirstModel:
 
         return zip(sorted_pool, sorted_jobs)
 
-
-#--------------------
+#-----------------------------------------------------------------
 # STEP FUNCTION MODEL 
-#--------------------
-class StepFunctionModel:
-    def __init__(self):
-        pass
-
-    def simulate_hiring(self, candidates, positions, school_info, **kwargs):
-        """ Simulate faculty hiring under the step function model.
-            This model is essentially the configuration model but only for 
-            candidates ranked at least as high as the institution making 
-            the hire. 
-
-            This null model captures the imposed ranking structure
-            from the minimum violations ranking scheme, which is that
-            schools want to avoid violations whenever possible.
-
-            If ranking is pi_inv (inverse of PI ranking)... 
-            setting `power' equal to 0, means that all positions are equally likely to be
-            filled first. Setting power to 1 means that positions will be chosen with
-            probability proportional to the inverse of their rank. The larger the power,
-            the more strictly the hiring order resembles the ranks. 
-        """
-        hires = []
-        ranking = kwargs.get('ranking', 'pi_inv')
-        power = kwargs.get('power', 1)
-
-        worst_ranking = school_info['UNKNOWN'][ranking]
-        num_jobs = len(positions)
-        num_candidates = len(candidates)
-        
-        # Populate list of available candidates
-        candidate_pool = []
-        # Use noise to preallocate ranks and break ties
-        candidate_ranks = NOISE_LEVEL * np.random.randn(num_candidates)
-        for i, f in enumerate(candidates):
-            place, year = f.phd()
-            try:
-                rank = school_info[place][ranking]
-            except:
-                rank = worst_ranking
-            candidate_ranks[i] += rank
-        candidate_pool = zip(candidates, candidate_ranks)
-        remaining_candidates = len(candidate_pool)
-
-        # Populate list of open jobs
-        job_ranks = NOISE_LEVEL * np.random.randn(num_jobs)
-        for i, s in enumerate(positions):
-            try:
-                rank = school_info[s][ranking]
-            except:
-                rank = worst_ranking
-            job_ranks[i] += rank
-
-        job_ranks = np.array(job_ranks) ** power
-        job_ranks /= job_ranks.sum()  # make probability
-
-        # Match candidates to jobs
-        for j in xrange(num_jobs):
-            # Select job to fill
-            job_ind = np.random.choice(xrange(num_jobs), p=job_ranks)
-            job_rank = job_ranks[job_ind]  # how much probability mass taken out?
-            if job_rank != 1.:
-                job_ranks /= (1.-job_rank)  # renormalize
-            job_ranks[job_ind] = 0.  # mark as unavailable
-
-            # Match candidate to job
-            # Select all of the candidates from a school at least as good as the job
-            cand_p = np.array([1.0 if cand_rank >= job_rank else 1e-6 
-                               for (c, cand_rank) in candidate_pool])
-            cand_p /= cand_p.sum()
-            cand_ind = np.random.choice(xrange(remaining_candidates), p=cand_p)
-
-            # Log the hire
-            hires.append((candidate_pool[cand_ind][0], positions[job_ind]))
-            
-            # Remove the candidate from the pool
-            del candidate_pool[cand_ind]
-            remaining_candidates -= 1 
-    
-        return hires
+# is now part of sigmoid_models.py. Just set prob_function='step'. 
+#-----------------------------------------------------------------
 
