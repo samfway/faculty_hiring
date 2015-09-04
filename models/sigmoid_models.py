@@ -9,6 +9,7 @@ __status__ = "Development"
 
 
 import numpy as np
+import scipy.special.expit as sigmoid
 
 
 """ All models expect similar inputs and return output in the same format.
@@ -24,7 +25,8 @@ import numpy as np
 """
 class SigmoidModel:
     def __init__(self):
-        self.prob_functions = {'step':prob_function_step_function}
+        self.prob_functions = {'step':prob_function_step_function,
+                               'rankdiff':prob_function_sigmoid_rank_diff}
 
     def simulate_hiring(self, candidates, positions, school_info, **kwargs):
         hires = []
@@ -102,8 +104,9 @@ class SigmoidModel:
 
     TEMPLATE
     def prob_function_...(candidates, inst, inst_rank, school_info, **kwargs):
-        cand_p = np.zeros(len(candidates), dtype=float)
-        ... 
+        cand_p = np.empty(len(candidates), dtype=float)
+        .... 
+        cand_p /= cand_p.sum()
         return cand_p
 """
 def prob_function_step_function(candidates, inst, inst_rank, school_info, **kwargs):
@@ -112,6 +115,17 @@ def prob_function_step_function(candidates, inst, inst_rank, school_info, **kwar
     for i, (candidate, candidate_rank) in enumerate(candidates):
         if candidate_rank >= inst_rank:
             cand_p[i] = 1.
+    cand_p /= cand_p.sum()
+    return cand_p
+
+
+def prob_function_sigmoid_rank_diff(candidates, inst, inst_rank, school_info, **kwargs):
+    cand_p = np.empty(len(candidates), dtype=float)
+    weights = kwargs.get('weights', np.array([1., 1.]))
+
+    for i, (candidate, candidate_rank) in enumerate(candidates):
+        cand_p[i] = sigmoid(np.dot(weights, [1., candidate_rank-inst_rank]))
+
     cand_p /= cand_p.sum()
     return cand_p
 
