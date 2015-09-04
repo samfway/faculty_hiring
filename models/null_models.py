@@ -62,7 +62,7 @@ class BestFirstModel:
         # Populate list of available candidates
         candidate_pool = []
         noise = NOISE_LEVEL * np.random.randn(len(candidates))
-        for i, f in enumerate(candidates:
+        for i, f in enumerate(candidates):
             place, year = f.phd()
             try:
                 rank = school_info[place][ranking]
@@ -93,7 +93,7 @@ class BestFirstModel:
 #--------------------
 # STEP FUNCTION MODEL 
 #--------------------
-class StepFunctionModel
+class StepFunctionModel:
     def __init__(self):
         pass
 
@@ -113,6 +113,7 @@ class StepFunctionModel
             probability proportional to the inverse of their rank. The larger the power,
             the more strictly the hiring order resembles the ranks. 
         """
+        hires = []
         ranking = kwargs.get('ranking', 'pi_inv')
         power = kwargs.get('power', 1)
 
@@ -143,29 +144,31 @@ class StepFunctionModel
                 rank = worst_ranking
             job_ranks[i] += rank
 
-        job_ranks = array(job_ranks) ** power
+        job_ranks = np.array(job_ranks) ** power
         job_ranks /= job_ranks.sum()  # make probability
 
         # Match candidates to jobs
         for j in xrange(num_jobs):
             # Select job to fill
-            job_ind = choice(xrange(num_jobs), p=job_ranks)
+            job_ind = np.random.choice(xrange(num_jobs), p=job_ranks)
             job_rank = job_ranks[job_ind]  # how much probability mass taken out?
-            job_ranks /= (1.-job_rank)  # renormalize
+            if job_rank != 1.:
+                job_ranks /= (1.-job_rank)  # renormalize
             job_ranks[job_ind] = 0.  # mark as unavailable
 
             # Match candidate to job
             # Select all of the candidates from a school at least as good as the job
-            cand_p = np.array([1 if cand_rank >= job_rank else 1e-9 
-                               for (c, c_rank) in candidate_pool])
+            cand_p = np.array([1.0 if cand_rank >= job_rank else 1e-6 
+                               for (c, cand_rank) in candidate_pool])
             cand_p /= cand_p.sum()
-            cand_ind = choice(xrange(remaining_candidates), p=cand_p)
+            cand_ind = np.random.choice(xrange(remaining_candidates), p=cand_p)
 
             # Log the hire
-            hires.append((candidate_pool[cand_ind], positions[job_ind])
+            hires.append((candidate_pool[cand_ind][0], positions[job_ind]))
             
             # Remove the candidate from the pool
             del candidate_pool[cand_ind]
             remaining_candidates -= 1 
     
         return hires
+
