@@ -54,4 +54,6 @@ class SimulationEngine:
         total_error /= (self.iterations * self.num_jobs)
         total_error += l2_penalty
 
+        print weights, total_error
+
         return total_error

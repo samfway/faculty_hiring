@@ -35,6 +35,7 @@ if __name__=="__main__":
     model = ConfigurationModel()
     simulator = SimulationEngine(candidate_pools, job_pools, inst, model)
     print 'Configuration:', simulator.simulate()
+    '''
 
     model = BestFirstModel()
     simulator = SimulationEngine(candidate_pools, job_pools, inst, model)
@@ -45,13 +46,12 @@ if __name__=="__main__":
     print 'Step (pow=2):', simulator.simulate()
 
     model = SigmoidModel()
-    simulator = SimulationEngine(candidate_pools, job_pools, inst, model, power=2, prob_function='rankdif', weights=[1.0, 2.0])
+    simulator = SimulationEngine(candidate_pools, job_pools, inst, model, power=2, prob_function='rankdiff', weights=[0.0, 0.0001])
     print 'RankDiff (pow=2):', simulator.simulate()
+    '''
 
-    ''' To profile your code... 
     model = SigmoidModel()
-    simulator = SimulationEngine(candidate_pools, job_pools, inst, model, power=2, prob_function='step')
-    print 'Step (pow=2):', simulator.simulate()
-
-    cProfile.run('simulator.simulate()')
-    ''' 
+    w0 = np.array([-27, -0.5])
+    simulator = SimulationEngine(candidate_pools, job_pools, inst, model, power=2, prob_function='rankdiff')
+    print 'Sigmoid', simulator.simulate(weights=w0)
+    #cProfile.run('simulator.simulate(weights=w0)')

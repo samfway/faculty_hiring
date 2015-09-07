@@ -9,7 +9,7 @@ __status__ = "Development"
 
 
 import numpy as np
-import scipy.special.expit as sigmoid
+from scipy.special import expit as sigmoid
 
 
 """ All models expect similar inputs and return output in the same format.
@@ -124,7 +124,7 @@ def prob_function_sigmoid_rank_diff(candidates, inst, inst_rank, school_info, **
     weights = kwargs.get('weights', np.array([1., 1.]))
 
     for i, (candidate, candidate_rank) in enumerate(candidates):
-        cand_p[i] = sigmoid(np.dot(weights, [1., candidate_rank-inst_rank]))
+        cand_p[i] = sigmoid(weights[0] + weights[1]*(inst_rank-candidate_rank))
 
     cand_p /= cand_p.sum()
     return cand_p
