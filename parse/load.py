@@ -12,6 +12,16 @@ import numpy as np
 from faculty_hiring.parse.faculty_parser import parse_faculty_records
 
 
+def load_assistant_profs(faculty_fp):
+    """ Return a list of the assistant professors """
+    assistant_professors = []
+    for f in parse_faculty_records(faculty_fp):
+        place, year = f.first_asst_prof()
+        if year is not None and place is not None:
+            assistant_professors.append(f)
+    return assistant_professors
+
+
 def load_hires_by_year(faculty_fp, year_start=1970, year_stop=2012, year_step=1):
     """ Get lists of faculty and hiring institutions by year (range of years)
         

@@ -93,6 +93,9 @@ class faculty_record:
     def __getitem__(self, key):
         return self.__dict__[key]
 
+    def __contains__(self, key):
+        return key in self.__dict__
+
     def __init__(self, lines):
         self.education = []
         self.faculty = []

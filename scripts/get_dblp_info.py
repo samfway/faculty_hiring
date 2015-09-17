@@ -52,10 +52,13 @@ def get_dblp_profiles(name):
 
     profiles = []
     for p in person_items:
-        profiles.append(p.find('a')['href'])
-
-    # Ensure the records are unique
-    profiles = list(set(profiles))
+        link = p.find('a')['href']
+        person_notes = p.find('small')
+        if person_notes:
+            line = ','.join([link, sanitize(person_notes.text)])
+        else:
+            line = link + ','
+        profiles.append(line)
 
     return profiles 
 
@@ -77,8 +80,8 @@ if __name__=="__main__":
         time.sleep(2)
         profiles = get_dblp_profiles(name) 
         for p in profiles:
-            to_write = [name]
-            to_write.append(sanitize(p))
+            to_write = [sanitize(name)]
+            to_write.append(p)
 
             # Dump to file
             output.write(','.join(to_write) + '\n')
