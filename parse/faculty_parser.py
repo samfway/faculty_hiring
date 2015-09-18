@@ -58,7 +58,7 @@ import numpy as np
 
 NEW_RECORD_SYMBOL = ">>>"
 INDIVIDUAL_FIELDS = ['facultyName', 'email', 'sex', 'department', 
-                     'place', 'current', 'recordDate']
+                     'place', 'current', 'recordDate', 'gs', 'dblp']
 EDUCATION_FIELDS = ['degree', 'place', 'field', 'years']
 FACULTY_FIELDS = ['rank', 'place', 'years']
 EDUCATION_FLAG = '[Education]'
@@ -117,9 +117,7 @@ class faculty_record:
                     values = [None]*len(FACULTY_FIELDS)
 
                 else:
-                    pieces = line.split(':')
-                    key = pieces[0].strip()
-                    value = ''.join(pieces[1:]).strip()
+                    key, value = [p.strip() for p in line.split(':',1)]
                     if key in INDIVIDUAL_FIELDS:
                         setattr(self, key, value)
 
