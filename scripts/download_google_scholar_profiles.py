@@ -43,6 +43,17 @@ def download_gs_page(gs_id, output_prefix, page_number):
     return response, filename
 
 
+def download_all_gs_pages(gs_id, output_prefix, start_at=0):
+    not_done = True
+    grab = start_at
+
+    while not_done:
+        resp, filename = download_gs_page(gs_id, output_prefix, grab)
+        not_done = has_more_pubs(filename)  # Check if there are more pubs
+        grab += 1
+        time.sleep(2)
+
+
 def has_more_pubs(filename, page_size=100):
     """ Check the Google scholar results page. Determine if there are
         additional pages of publications.
@@ -95,18 +106,10 @@ if __name__=="__main__":
         if not grab_all:
             # Just grab the one file
             resp, filename = download_gs_page(gs_id, output_prefix, args.page_number)
-            print c, gs_name, gs_id
             time.sleep(2)
         else:
-            grab = args.page_number
-            not_done = True
-            while not_done:
-                resp, filename = download_gs_page(gs_id, output_prefix, grab)
-                not_done = has_more_pubs(filename)  # Check if there are more pubs
-                grab += 1
-                time.sleep(2)
-            print c, gs_name, gs_id, grab
-            
+            download_all_gs_pages(gs_id, output_prefix, args.page_number)
+        print c, gs_name, gs_id
         c += 1
         
     error_out.close()
