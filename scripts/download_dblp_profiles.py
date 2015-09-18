@@ -26,8 +26,12 @@ def interface():
     return args
 
 
+def get_author_tag(dblp_url):
+    return re.findall(r'(?<=pers/hd/./)[^,]+(?=,?)', dblp_url)[0]
+
+
 def download_dblp_page(dblp_url, output_prefix, page_number=0):
-    author_tag = re.findall(r'(?<=pers/hd/./)[^,]+(?=,?)', dblp_url)[0]
+    author_tag = get_author_tag(dblp_url)
     filename = output_prefix + author_tag + '_file_%d.html' % (page_number)
     fname, response = urllib.urlretrieve(dblp_url, filename)
     return response, filename
