@@ -137,3 +137,16 @@ if __name__=="__main__":
     link_dblp_profiles(faculty, args.dblp_file)
     add_links_to_file(faculty, args.faculty_file, args.output_file)
     
+    covered = 0
+    both = 0
+    for f in faculty:
+        if 'gs' in f or 'dblp' in f:
+            covered += 1
+        else:
+            print f['facultyName']
+        if 'gs' in f and 'dblp' in f:
+            both += 1
+    print '%d of %d have at least one of the two profiles.' % (covered, len(faculty))
+    print '%d of %d have both profiles.' % (both, len(faculty))
+            
+    
