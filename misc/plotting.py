@@ -13,6 +13,17 @@ __status__ = "Development"
 from numpy import arange, array
 import matplotlib.pyplot as plt
 
+
+# CONSTANTS
+BAR_WIDTH = 0.6
+TICK_SIZE = 15
+XLABEL_PAD = 10
+LABEL_SIZE = 14
+TITLE_SIZE = 16
+LEGEND_SIZE = 12
+LINE_WIDTH = 2
+
+
 def plot_confusion_matrix(M, labels, ax, cmap=plt.cm.Blues, rng=None):
     """ Plot a confusion matrix on supplied axes. 
     
