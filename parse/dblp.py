@@ -8,7 +8,11 @@ __email__ = "samfway@gmail.com"
 __status__ = "Development"
 
 
+import os
 from bs4 import BeautifulSoup
+
+
+DBLP_FILE = 'DBLP_%s_file_0.html'
 
 
 """
@@ -48,4 +52,19 @@ def parse_dblp_page(html_string):
                                    [title, authors, link, pub_type, year]))
                     publications.append(pub)
 
-    return publications, stats  
+    return publications, stats
+
+
+def parse_dblp_publications(faculty, dblp_dir):
+    """ Load all publications into the faculty record """ 
+    for f in faculty:
+        print f['facultyName']
+        if 'dblp' in f:
+            filename = os.path.join(dblp_dir, DBLP_FILE % f['dblp'])
+            if os.path.isfile(filename):
+                pubs, stats = parse_dblp_page(open(filename, 'rU').read())
+                f['dblp_pubs'] = pubs
+                f['dblp_stats'] = stats
+            else:
+                print 'DBLP file missing for "%s"!' % f['facultyName']
+            
