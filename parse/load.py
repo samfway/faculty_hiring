@@ -8,8 +8,19 @@ __email__ = "samfway@gmail.com"
 __status__ = "Development"
 
 
+import os
 import numpy as np
 from faculty_hiring.parse.faculty_parser import parse_faculty_records
+from faculty_hiring.parse.dblp import parse_dblp_publications
+from faculty_hiring.parse.google_scholar import parse_gs_publications
+try:
+   import cPickle as pickle
+except:
+   import pickle
+
+
+GS_PKL = 'GSP_%s.pkl'
+DBLP_PKL = 'DBLP_%s.pkl'
 
 
 def load_assistant_profs(faculty_fp):
@@ -55,3 +66,20 @@ def load_hires_by_year(faculty_fp, year_start=1970, year_stop=2012, year_step=1)
                 break  # Advance to next year range
 
     return candidate_pools, job_pools, year_range
+
+
+def load_all_publications(faculty, dblp_dir, gs_dir):
+    """ Load all publication data into faculty records """ 
+    for f in faculty:
+        if 'gs' in f:
+            filename = os.path.join(gs_dir, GS_PKL % f['gs'])
+            with open(filename,'rb') as fp:
+                f['gs_pubs'] = pickle.load(fp)
+                f['gs_stats'] = pickle.load(fp)
+                
+        if 'dblp' in f:
+            filename = os.path.join(dblp_dir, DBLP_PKL % f['dblp'])
+            with open(filename,'rb') as fp:
+                f['dblp_pubs'] = pickle.load(fp)
+                f['dblp_stats'] = pickle.load(fp)
+
