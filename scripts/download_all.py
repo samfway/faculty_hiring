@@ -11,7 +11,7 @@ __status__ = "Development"
 import os
 import argparse
 from faculty_hiring.parse.load import load_assistant_profs
-from faculty_hiring.scripts.download_dblp_profiles import download_dblp_page
+from faculty_hiring.scripts.download_dblp_profiles import download_dblp_page, get_dblp_url
 from faculty_hiring.scripts.download_google_scholar_profiles import download_all_gs_pages
 
 
@@ -31,7 +31,20 @@ def interface():
 if __name__=="__main__":
     args = interface()
     faculty = load_assistant_profs(open(args.faculty_file, 'rU')) 
+    gs_prefix = os.path.join(args.gs_dir, 'GSP_')
+    dblp_prefix = os.path.join(args.dblp_dir, 'DBLP_')
+
     for f in faculty:
-        if 'gs' in f:  # If they have a GS profile
-            os.path.isfile(fname) 
+        # Check for each profile, download if missing
+        if 'gs' in f:
+            gs_file = os.path.join(args.gs_dir, GS_FILE % f['gs'])
+            if not os.path.isfile(gs_file):
+                print 'GS -> ', f['facultyName']
+                download_all_gs_pages(f['gs'], gs_prefix)
             
+        if 'dblp' in f:
+            dblp_file = os.path.join(args.dblp_dir, DBLP_FILE % f['dblp'])
+            if not os.path.isfile(dblp_file):
+                print 'DBLP -> ', f['facultyName']
+                dblp_url = get_dblp_url(f['dblp'])
+                download_dblp_page(dblp_url, dblp_prefix)
