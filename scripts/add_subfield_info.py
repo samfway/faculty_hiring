@@ -79,7 +79,7 @@ def add_doc_topics_to_file(doc_topics_dict, input_file, output_file):
             tag = line.split(':', 1)[1].strip()
             if tag in doc_topics_dict:
                 output.write(line)
-                output.write('# topic_dist  : %s\n' % doc_topics_dict[tag])
+                output.write('# topic_dist  : %s\n' % ','.join([str(x) for x in doc_topics_dict[tag]]))
                 written = True
         if not written:
             output.write(line)
