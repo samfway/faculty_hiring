@@ -58,7 +58,7 @@ import numpy as np
 
 NEW_RECORD_SYMBOL = ">>>"
 INDIVIDUAL_FIELDS = ['facultyName', 'email', 'sex', 'department', 
-                     'place', 'current', 'recordDate', 'gs', 'dblp']
+                     'place', 'current', 'recordDate', 'gs', 'dblp', 'topic_dist']
 EDUCATION_FIELDS = ['degree', 'place', 'field', 'years']
 FACULTY_FIELDS = ['rank', 'place', 'years']
 EDUCATION_FLAG = '[Education]'
@@ -120,6 +120,9 @@ class faculty_record:
                     key, value = [p.strip() for p in line.split(':',1)]
                     if key in INDIVIDUAL_FIELDS:
                         setattr(self, key, value)
+                    if key == 'topic_dist':
+                        topic_dist = np.array([float(x) for x in value.split(',')])
+                        setattr(self, key, topic_dist)
 
             elif status == 'education':
                 pieces = line.split(':')
