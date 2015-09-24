@@ -29,8 +29,9 @@ class SigmoidModel:
                                'rankdiff':prob_function_sigmoid_rank_diff}
 
     def simulate_hiring(self, candidates, positions, school_info, **kwargs):
+        """ Returns a list of person-place tuples (hires) """ 
         hires = []
-        ranking = kwargs.get('ranking', 'pi_inv')
+        ranking = kwargs.get('ranking', 'pi_rescaled')
         power = kwargs.get('power', 1)
         f = kwargs.get('prob_function', 'step')
         prob_function = self.prob_functions[f] 
@@ -40,7 +41,6 @@ class SigmoidModel:
         num_candidates = len(candidates)
         
         # Populate list of available candidates
-        candidate_pool = []
         candidate_ranks = np.empty(num_candidates, dtype=float)
         for i, f in enumerate(candidates):
             place, year = f.phd()

@@ -34,7 +34,9 @@ if __name__=="__main__":
     candidate_pools, job_pools, year_range = load_hires_by_year(open(args.fac_file, 'rU'))
 
     model = SigmoidModel()
-    w0 = np.array([.1,  .1])
-    simulator = SimulationEngine(candidate_pools, job_pools, inst, model, power=2, prob_function='rankdiff', weights=w0, reg=0.)
-    res = minimize(simulator.simulate, w0)
+    w0 = np.random.random(2)
+    bounds = [(-100, 100), (-100, 100)]
+    simulator = SimulationEngine(candidate_pools, job_pools, inst, model, power=-1, prob_function='rankdiff', weights=w0, reg=1000., iters=50)
+    res = minimize(simulator.simulate, w0, bounds=bounds)
     print res
+
