@@ -57,3 +57,16 @@ class SimulationEngine:
         print weights, total_error
 
         return total_error
+
+
+    def generate_network(self):
+        """ Generate a network (list of hires) using the 
+            specified hiring model """ 
+        all_hires = []
+        for i in xrange(self.num_pools):
+            all_hires += self.model.simulate_hiring(self.candidate_pools[i],
+                                                    self.job_pools[i], 
+                                                    self.school_info,
+                                                    **self.model_args)
+        return all_hires
+    

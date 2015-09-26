@@ -22,6 +22,8 @@ LABEL_SIZE = 14
 TITLE_SIZE = 16
 LEGEND_SIZE = 12
 LINE_WIDTH = 2
+LIGHT_COLOR = '0.8'
+DARK_COLOR = '0.2'
 
 
 def plot_confusion_matrix(M, labels, ax, cmap=plt.cm.Blues, rng=None):
@@ -83,3 +85,35 @@ def color_bp(bp, color):
         plt.setp(x, color=c)
     for x in bp['caps']:
         plt.setp(x, color=c)
+
+
+def adjust_spines(ax, spines):
+    """ From http://matplotlib.org/examples/pylab_examples/spine_placement_demo.html """ 
+    for loc, spine in ax.spines.items():
+        if loc in spines:
+            spine.set_position(('outward', 10))  # outward by 10 points
+            spine.set_smart_bounds(True)
+        else:
+            spine.set_color('none')  # don't draw spine
+
+    # turn off ticks where there is no spine
+    if 'left' in spines:
+        ax.yaxis.set_ticks_position('left')
+    else:
+        # no yaxis ticks
+        ax.yaxis.set_ticks([])
+
+    if 'bottom' in spines:
+        ax.xaxis.set_ticks_position('bottom')
+    else:
+        # no xaxis ticks
+        ax.xaxis.set_ticks([])
+
+
+def hide_right_top_axis(ax):
+    """ Remove the top and right axis """ 
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().tick_left()
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
+

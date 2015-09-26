@@ -68,6 +68,36 @@ def load_hires_by_year(faculty_fp, year_start=1970, year_stop=2012, year_step=1)
     return candidate_pools, job_pools, year_range
 
 
+def split_faculty_by_year(faculty, year_start, year_stop, year_step=1):
+    """ Similar to load_hires_by_year, but instead it takes in a list
+        of faculty and splits into candidate/job pools. """ 
+    year_range = np.arange(year_start, year_stop, year_step)
+    num_steps = len(year_range)
+    candidate_pools = [[] for year in xrange(num_steps - 1)]
+    job_pools = [[] for year in xrange(num_steps - 1)]
+    num_professors = len(faculty)
+
+    fac = [(f.first_asst_job_year, f.first_asst_job_location, f) for f in faculty]
+    fac.sort()
+
+    YEAR = 0; PLACE = 1 ; FACULTY = 2
+
+    ptr = 0  # Index over the list of faculty
+    for i in xrange(num_steps-1):  # Index over the time bins
+        start = year_range[i]
+        stop = year_range[i+1]
+        while ptr < num_professors:
+            if fac[ptr][YEAR] < stop: 
+                if fac[ptr][YEAR] >= start:
+                    job_pools[i].append(fac[ptr][PLACE])
+                    candidate_pools[i].append(fac[ptr][FACULTY])
+                ptr += 1
+            else:
+                break  # Advance to next year range
+
+    return candidate_pools, job_pools, year_range
+
+
 def load_all_publications(faculty, dblp_dir, gs_dir):
     """ Load all publication data into faculty records """ 
     for f in faculty:
