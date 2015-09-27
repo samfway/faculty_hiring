@@ -21,8 +21,8 @@ from faculty_hiring.models.sigmoid_models import SigmoidModel
 
 def interface():
     args = argparse.ArgumentParser()
-    args.add_argument('-f', '--fac-file', help='Faculty file')
-    args.add_argument('-i', '--inst-file', help='Institutions file')
+    args.add_argument('-f', '--fac-file', help='Faculty file', required=True)
+    args.add_argument('-i', '--inst-file', help='Institutions file', required=True)
     args = args.parse_args()
     return args
 

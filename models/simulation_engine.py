@@ -52,11 +52,10 @@ class SimulationEngine:
                                                    **self.model_args)
                 total_error += sse_rank_diff(hires, self.school_info, 'pi')
         total_error /= (self.iterations * self.num_jobs)
-        total_error += l2_penalty
 
-        print weights, total_error
+        print weights, '%.2f \t %.2f' % (total_error, total_error + l2_penalty)
 
-        return total_error
+        return total_error + l2_penalty 
 
 
     def generate_network(self):
