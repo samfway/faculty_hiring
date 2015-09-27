@@ -10,7 +10,7 @@ __status__ = "Development"
 """ Functions to plot a confusion matrix (heat map) 
 """
 
-from numpy import arange, array
+import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -24,6 +24,8 @@ LEGEND_SIZE = 12
 LINE_WIDTH = 2
 LIGHT_COLOR = '0.8'
 DARK_COLOR = '0.2'
+MALE_COLOR = np.array([0.25490196, 0.41176471, 0.88235294])
+FEMALE_COLOR = np.array([1.,  0.36,  0.72])
 
 
 def plot_confusion_matrix(M, labels, ax, cmap=plt.cm.Blues, rng=None):
@@ -56,8 +58,8 @@ def plot_confusion_matrix(M, labels, ax, cmap=plt.cm.Blues, rng=None):
     #    max_value = 1.0 # matrix is normalized 
 
     heatmap = ax.pcolor(M, cmap=cmap)
-    ax.set_xticks(arange(M.shape[0])+0.5, minor=False)
-    ax.set_yticks(arange(M.shape[1])+0.5, minor=False)
+    ax.set_xticks(np.arange(M.shape[0])+0.5, minor=False)
+    ax.set_yticks(np.arange(M.shape[1])+0.5, minor=False)
     ax.invert_yaxis()
     ax.xaxis.tick_top()
     ax.set_xticklabels(labels, minor=False) # add rotation=int to rotate labels
@@ -71,7 +73,7 @@ def plot_confusion_matrix(M, labels, ax, cmap=plt.cm.Blues, rng=None):
     
 
 def color_bp(bp, color):
-    c = array(color) * 0.5
+    c = np.array(color) * 0.5
     c = tuple(c)
 
     for x in bp['boxes']:
