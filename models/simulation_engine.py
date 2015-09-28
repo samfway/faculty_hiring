@@ -38,9 +38,11 @@ class SimulationEngine:
         """
         total_error = 0.
 
-        if weights is not None and self.regularization > 0.:
-            self.model_args['weights'] = weights
-            l2_penalty = np.dot(weights[1:], weights[1:]) * self.regularization
+        if weights is not None:
+            self.model.weights = weights
+
+        if self.regularization > 0.:
+            l2_penalty = np.dot(self.model.weights[1:], self.model.weights[1:]) * self.regularization
         else:
             l2_penalty = 0.0
 

@@ -31,13 +31,17 @@ if __name__=="__main__":
     args = interface()
     
     inst = parse_institution_records(open(args.inst_file, 'rU'))
-    candidate_pools, job_pools, year_range = load_assistant_prof_pools(open(args.fac_file, 'rU'), school_info=inst, ranking='pi_rescaled',
-                                                                       year_start=1970, year_stop=2012, year_step=1)
+    candidate_pools, job_pools, job_ranks, year_range = load_assistant_prof_pools(open(args.fac_file), 
+                                                                                  school_info=inst, 
+                                                                                  ranking='pi_rescaled',
+                                                                                  year_start=1970, 
+                                                                                  year_stop=2012, 
+                                                                                  year_step=1)
 
-    model = SigmoidModel()
-    w0 = 10*np.random.randn(2)
+    model = SigmoidModel(prob_function='rd_rh')
+    w0 = 10*np.random.randn(3)
     bounds = [(-100, 100), (-100, 100)]
-    simulator = SimulationEngine(candidate_pools, job_pools, inst, model, power=1, prob_function='rankdiff', weights=w0, reg=10., iters=100)
+    simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=10., iters=100)
     res = minimize(simulator.simulate, w0, bounds=bounds, method='Nelder-Mead')
     print res
 
