@@ -31,10 +31,10 @@ class ConfigurationModel:
     def __init__(self):
         pass
     
-    def simulate_hiring(self, candidates, positions, school_info, **kwargs):
+    def simulate_hiring(self, candidates, positions, position_ranks, school_info, **kwargs):
         """ All candidates have an equal chance of being hired to each job """ 
-        random_candidates = np.random.permutation(candidates)
-        return zip(random_candidates, positions)
+        candidates_without_ranks = np.random.permutation([f[0] for f in candidates])
+        return zip(candidates_without_ranks, positions)
 
 
 # -------------------
@@ -44,7 +44,7 @@ class BestFirstModel:
     def __init__(self):
         pass
 
-    def simulate_hiring(self, candidates, positions, school_info, **kwargs):
+    def simulate_hiring(self, candidates, positions, position_ranks, school_info, **kwargs):
         """ Simulate faculty hiring under the 'best-first' model.
             Under this model, the highest-ranked job is filled first,
             and they blindly pick the candidate from the highest-ranked
@@ -56,29 +56,18 @@ class BestFirstModel:
             Haven't heard of that school? We'll assume the hiring committee hasn't either, 
             and you get no bonus points for prestige.
         """
-        ranking = kwargs.get('ranking', 'pi_inv')
-        worst_ranking = school_info['UNKNOWN'][ranking]
-
         # Populate list of available candidates
         candidate_pool = []
         noise = NOISE_LEVEL * np.random.randn(len(candidates))
         for i, f in enumerate(candidates):
-            place, year = f.phd()
-            try:
-                rank = school_info[place][ranking]
-            except:
-                rank = worst_ranking
-            candidate_pool.append((rank+noise[i], f))
+            # candidates are tuples (faculty_profile, phd_rank)
+            candidate_pool.append((f[1]+noise[i], f[0]))
 
         # Populate list of open jobs
         job_pool = []
         noise = 0.1 * np.random.randn(len(positions))
         for i, s in enumerate(positions):
-            try:
-                rank = school_info[s][ranking]
-            except:
-                rank = worst_ranking
-            job_pool.append((rank+noise[i], s))
+            job_pool.append((position_ranks[i]+noise[i], s))
 
         # Sort both lists and zip them together:
         # Highest ranked candidate goes to the highest ranked job.

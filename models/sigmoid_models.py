@@ -27,40 +27,18 @@ class SigmoidModel:
     def __init__(self):
         self.prob_functions = {'step':prob_function_step_function,
                                'rankdiff':prob_function_sigmoid_rank_diff}
+        self.best_params = {'step' : None,
+                            'rankdiff' : [-1.68965263, -5.94514355]}
 
-    def simulate_hiring(self, candidates, positions, school_info, **kwargs):
+    def simulate_hiring(self, candidates, positions, position_ranks, school_info, **kwargs):
         """ Returns a list of person-place tuples (hires) """ 
         hires = []
-        ranking = kwargs.get('ranking', 'pi_rescaled')
-        power = kwargs.get('power', 1)
         f = kwargs.get('prob_function', 'step')
         prob_function = self.prob_functions[f] 
 
-        worst_ranking = school_info['UNKNOWN'][ranking]
-        num_jobs = len(positions)
-        num_candidates = len(candidates)
-        
-        # Populate list of available candidates
-        candidate_ranks = np.empty(num_candidates, dtype=float)
-        for i, f in enumerate(candidates):
-            place, year = f.phd()
-            try:
-                candidate_ranks[i] = school_info[place][ranking]
-            except:
-                candidate_ranks[i] = worst_ranking
-        candidate_pool = zip(candidates, candidate_ranks)
-        remaining_candidates = len(candidate_pool)
-
-        # Populate list of open jobs
-        job_ranks = np.zeros(num_jobs, dtype=float)
-        for i, s in enumerate(positions):
-            try:
-                job_ranks[i] = school_info[s][ranking]
-            except:
-                job_ranks[i] = worst_ranking
-
-        job_p = job_ranks.copy() ** power
-        job_p /= job_p.sum()  # make probability
+        # Prepare job rankings (used to determine order in which jobs are filled)
+        job_ranks = np.array(position_ranks, dtype=float)
+        job_p = job_ranks / job_ranks.sum()  # make probability
 
         # Match candidates to jobs
         for j in xrange(num_jobs-1):
@@ -71,7 +49,6 @@ class SigmoidModel:
             job_p /= np.sum(job_p)  # renormalize
 
             # Match candidate to job
-            # Select all of the candidates from a school at least as good as the job
             cand_p = prob_function(candidate_pool, positions[job_ind], job_rank, school_info, **kwargs)
             cand_ind = np.random.multinomial(1, cand_p).argmax()
 

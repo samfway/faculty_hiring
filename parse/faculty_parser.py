@@ -96,7 +96,7 @@ class faculty_record:
     def __contains__(self, key):
         return key in self.__dict__
 
-    def __init__(self, lines):
+    def __init__(self, lines, school_info=None, ranking='pi_rescaled'):
         self.education = []
         self.faculty = []
 
@@ -188,6 +188,18 @@ class faculty_record:
         for record in self.faculty:
             if record['rank'] == 'PostDoc':
                 self.has_postdoc = True
+
+        # Set ranking info, if supplied
+        if school_info is not None:
+            if self.phd_location in school_info:
+                self.phd_rank = school_info[self.phd_location][ranking]
+            else:
+                self.phd_rank = school_info['UNKNOWN'][ranking]
+
+            if self.first_asst_job_location in school_info:
+                self.first_asst_job_rank = school_info[self.first_asst_job_location][ranking]
+            else:
+                self.first_asst_job_rank = school_info['UNKNOWN'][ranking]
         
 
     def phd(self):
@@ -239,7 +251,7 @@ class faculty_record:
         return None, None
 
 
-def parse_faculty_records(fp):
+def parse_faculty_records(fp, school_info=None, ranking='pi_rescaled'):
     """ Parse a faculty record file.
         This is a generator function which yields
         one record at a time, as they appear in the 
@@ -260,12 +272,12 @@ def parse_faculty_records(fp):
 
         if line.startswith(NEW_RECORD_SYMBOL):
             if partial_record:
-                yield faculty_record(temp_buffer)
+                yield faculty_record(temp_buffer, school_info, ranking)
             temp_buffer = []
             partial_record = True  # new individual
         else:
             temp_buffer.append(line)
 
     if partial_record:
-        yield faculty_record(temp_buffer)
+        yield faculty_record(temp_buffer, school_info, ranking)
 

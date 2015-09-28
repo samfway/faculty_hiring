@@ -23,49 +23,21 @@ GS_PKL = 'GSP_%s.pkl'
 DBLP_PKL = 'DBLP_%s.pkl'
 
 
-def load_assistant_profs(faculty_fp):
+def load_assistant_prof_pools(faculty_fp, school_info=None, ranking='pi_rescaled',
+                              year_start=1970, year_stop=2012, year_step=1):
+    """ Load all assistant professors, format as pools for simulation models """ 
+    assistant_professors = load_assistant_profs(faculty_fp, school_info, ranking)
+    return split_faculty_by_year(assistant_professors, year_start, year_stop, year_step)
+
+
+def load_assistant_profs(faculty_fp, school_info=None, ranking='pi_rescaled'):
     """ Return a list of the assistant professors """
     assistant_professors = []
-    for f in parse_faculty_records(faculty_fp):
+    for f in parse_faculty_records(faculty_fp, school_info, ranking):
         place, year = f.first_asst_prof()
         if year is not None and place is not None:
             assistant_professors.append(f)
     return assistant_professors
-
-
-def load_hires_by_year(faculty_fp, year_start=1970, year_stop=2012, year_step=1):
-    """ Get lists of faculty and hiring institutions by year (range of years)
-        
-        Returns two lists of lists:
-          - candidate_pools: all faculty profiles hired in each hiring period.
-          - job_pools: all institutions making hires during those years.
-    """ 
-    year_range = np.arange(year_start, year_stop, year_step) 
-    num_steps = len(year_range)
-    candidate_pools = [[] for year in xrange(num_steps - 1)]
-    job_pools = [[] for year in xrange(num_steps - 1)]
-
-    assistant_professors = []
-    for f in parse_faculty_records(faculty_fp):
-        place, year = f.first_asst_prof()
-        if year is not None and year >= year_start and year <= year_stop:
-            assistant_professors.append((year, place, f))
-    YEAR = 0 ; PLACE = 1 ; FACULTY = 2
-    assistant_professors.sort()
-    num_professors = len(assistant_professors)
-
-    ptr = 0
-    for i in xrange(num_steps-1):
-        stop = year_range[i+1]
-        while ptr < num_professors:
-            if assistant_professors[ptr][YEAR] < stop:
-                job_pools[i].append(assistant_professors[ptr][PLACE])
-                candidate_pools[i].append(assistant_professors[ptr][FACULTY])
-                ptr += 1
-            else:
-                break  # Advance to next year range
-
-    return candidate_pools, job_pools, year_range
 
 
 def split_faculty_by_year(faculty, year_start, year_stop, year_step=1):
@@ -75,6 +47,7 @@ def split_faculty_by_year(faculty, year_start, year_stop, year_step=1):
     num_steps = len(year_range)
     candidate_pools = [[] for year in xrange(num_steps - 1)]
     job_pools = [[] for year in xrange(num_steps - 1)]
+    job_ranks = [[] for year in xrange(num_steps - 1)]
     num_professors = len(faculty)
 
     fac = [(f.first_asst_job_year, f.first_asst_job_location, f) for f in faculty]
@@ -90,12 +63,13 @@ def split_faculty_by_year(faculty, year_start, year_stop, year_step=1):
             if fac[ptr][YEAR] < stop: 
                 if fac[ptr][YEAR] >= start:
                     job_pools[i].append(fac[ptr][PLACE])
-                    candidate_pools[i].append(fac[ptr][FACULTY])
+                    job_ranks[i].append(fac[ptr][FACULTY].first_asst_job_rank)
+                    candidate_pools[i].append((fac[ptr][FACULTY], f.phd_rank))
                 ptr += 1
             else:
                 break  # Advance to next year range
 
-    return candidate_pools, job_pools, year_range
+    return candidate_pools, job_pools, job_ranks, year_range
 
 
 def load_all_publications(faculty, dblp_dir, gs_dir):
@@ -112,4 +86,5 @@ def load_all_publications(faculty, dblp_dir, gs_dir):
             with open(filename,'rb') as fp:
                 f['dblp_pubs'] = pickle.load(fp)
                 f['dblp_stats'] = pickle.load(fp)
+
 

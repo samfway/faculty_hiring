@@ -13,10 +13,11 @@ from faculty_hiring.misc.scoring import sse_rank_diff
 
 
 class SimulationEngine:
-    def __init__(self, candidate_pools, job_pools, school_info, model, 
+    def __init__(self, candidate_pools, job_pools, job_ranks, school_info, model, 
                  iters=10, reg=0., **kwargs):
         self.candidate_pools = candidate_pools
         self.job_pools = job_pools
+        self.job_ranks = job_ranks
         self.school_info = school_info
         self.model = model
         self.model_args = kwargs
@@ -27,7 +28,6 @@ class SimulationEngine:
         self.num_jobs = 0.
         for job_pool in job_pools:
             self.num_jobs += len(job_pool)
-            
     
     
     def simulate(self, weights=None):
@@ -48,6 +48,7 @@ class SimulationEngine:
             for i in xrange(self.num_pools):
                 hires = self.model.simulate_hiring(self.candidate_pools[i],
                                                    self.job_pools[i],
+                                                   self.job_ranks[i],
                                                    self.school_info,
                                                    **self.model_args)
                 total_error += sse_rank_diff(hires, self.school_info, 'pi')
@@ -65,6 +66,7 @@ class SimulationEngine:
         for i in xrange(self.num_pools):
             all_hires += self.model.simulate_hiring(self.candidate_pools[i],
                                                     self.job_pools[i], 
+                                                    self.job_ranks[i],
                                                     self.school_info,
                                                     **self.model_args)
         return all_hires

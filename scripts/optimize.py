@@ -12,7 +12,7 @@ import argparse
 import numpy as np
 import cProfile
 from scipy.optimize import minimize
-from faculty_hiring.parse.load import load_hires_by_year
+from faculty_hiring.parse.load import load_assistant_prof_pools
 from faculty_hiring.parse.institution_parser import parse_institution_records
 from faculty_hiring.models.simulation_engine import SimulationEngine
 from faculty_hiring.models.null_models import ConfigurationModel, BestFirstModel
@@ -31,7 +31,8 @@ if __name__=="__main__":
     args = interface()
     
     inst = parse_institution_records(open(args.inst_file, 'rU'))
-    candidate_pools, job_pools, year_range = load_hires_by_year(open(args.fac_file, 'rU'))
+    candidate_pools, job_pools, year_range = load_assistant_prof_pools(open(args.fac_file, 'rU'), school_info=inst, ranking='pi_rescaled',
+                                                                       year_start=1970, year_stop=2012, year_step=1)
 
     model = SigmoidModel()
     w0 = 10*np.random.randn(2)
