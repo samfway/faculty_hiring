@@ -1,6 +1,9 @@
 # Mac stuff
 .DS_Store
 
+# vim files
+*.swp
+
 # Data dir
 data/
 
