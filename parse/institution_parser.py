@@ -96,6 +96,7 @@ def parse_institution_records(fp):
     institutions['UNKNOWN']['pi'] = worst_ranking
     institutions['UNKNOWN']['pi_inv'] = 1./worst_ranking
     institutions['UNKNOWN']['pi_rescaled'] = scale(worst_ranking)
+    institutions['UNKNOWN']['Region'] = 'Earth'
 
     return institutions 
 

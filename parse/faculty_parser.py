@@ -189,17 +189,24 @@ class faculty_record:
             if record['rank'] == 'PostDoc':
                 self.has_postdoc = True
 
-        # Set ranking info, if supplied
+        # Are they female? 
+        self.is_female = self['sex'] == 'F'
+
+        # Set ranking/geography info, if supplied
         if school_info is not None:
             if self.phd_location in school_info:
                 self.phd_rank = school_info[self.phd_location][ranking]
+                self.phd_region = school_info[self.phd_location]['Region']
             else:
                 self.phd_rank = school_info['UNKNOWN'][ranking]
+                self.phd_region = school_info['UNKNOWN']['Region']
 
             if self.first_asst_job_location in school_info:
                 self.first_asst_job_rank = school_info[self.first_asst_job_location][ranking]
+                self.first_asst_job_region = school_info[self.first_asst_job_location]['Region']
             else:
                 self.first_asst_job_rank = school_info['UNKNOWN'][ranking]
+                self.first_asst_job_region = school_info['UNKNOWN']['Region']
         
 
     def phd(self):

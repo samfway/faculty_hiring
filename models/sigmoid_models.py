@@ -52,7 +52,6 @@ from scipy.special import expit as sigmoid
     LENGEND FOR FUNCTION NAMES
     - rd: difference in rank between phd and first job (job-phd)
     - rh: rank of hiring institution
-    - sf: subfield
     - gg: geography
     - pr: productivity
     - pd: has post-doctoral experience
@@ -68,7 +67,7 @@ def prob_function_step_function(candidates, cand_available, inst, inst_rank, sch
     return cand_p
 
 
-def prob_function_sigmoid_rank_diff(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+def prob_function_sigmoid_rd(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
     cand_p = np.zeros(len(candidates), dtype=float)
     for i, (candidate, candidate_rank) in enumerate(candidates):
         if cand_available[i]:
@@ -86,23 +85,29 @@ def prob_function_sigmoid_rd_rh(candidates, cand_available, inst, inst_rank, sch
     return cand_p
 
 
-def prob_function_sigmoid_rd_rh_sf(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+def prob_function_sigmoid_rd_rh_gg(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
     cand_p = np.zeros(len(candidates), dtype=float)
+    job_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
     for i, (candidate, candidate_rank) in enumerate(candidates):
         if cand_available[i]:
-            cand_p[i] = sigmoid(np.dot(weights, [1, inst_rank-candidate_rank, inst_rank]))
+            cand_p[i] = sigmoid(np.dot(weights, [1, 
+                                                 inst_rank-candidate_rank,
+                                                 inst_rank,
+                                                 int(job_region == candidate.phd_region)]))
     cand_p /= cand_p.sum()
     return cand_p
 
 
 # Provide easy access to the functions above.
-default_weights = {'step'     : None,
-                   'rankdiff' : [-1.68965263, -5.94514355],
-                   'rd_rh'    : [-1.68965263, -5.94514355, -2.0101010101010101]}
+default_weights = {'step'     : [],
+                   'rd'       : [-1.68965263, -5.94514355],
+                   'rd_rh'    : [-1.68965263, -5.94514355, -2.0101010101010101],
+                   'rd_rh_gg' : [-1.68965263, -5.94514355, -2.01010, 2.0101010]}
 
 prob_functions = {'step'      : prob_function_step_function,
-                  'rankdiff'  : prob_function_sigmoid_rank_diff,
-                  'rd_rh'     : prob_function_sigmoid_rd_rh}
+                  'rd'        : prob_function_sigmoid_rd,
+                  'rd_rh'     : prob_function_sigmoid_rd_rh,
+                  'rd_rh_gg'  : prob_function_sigmoid_rd_rh_gg}
 
 
 class SigmoidModel:

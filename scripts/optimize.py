@@ -23,6 +23,8 @@ def interface():
     args = argparse.ArgumentParser()
     args.add_argument('-f', '--fac-file', help='Faculty file', required=True)
     args.add_argument('-i', '--inst-file', help='Institutions file', required=True)
+    args.add_argument('-p', '--prob-function', help='Candidate probability/matching function', required=True)
+    args.add_argument('-n', '--num-iters', help='Number of iterations to est. error', default=100, type=int)
     args = args.parse_args()
     return args
 
@@ -38,10 +40,9 @@ if __name__=="__main__":
                                                                                   year_stop=2012, 
                                                                                   year_step=1)
 
-    model = SigmoidModel(prob_function='rd_rh')
-    w0 = 10*np.random.randn(3)
-    bounds = [(-100, 100), (-100, 100)]
-    simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=10., iters=100)
-    res = minimize(simulator.simulate, w0, bounds=bounds, method='Nelder-Mead')
+    model = SigmoidModel(prob_function=args.prob_function)
+    w0 = 10*np.random.randn(model.num_weights())
+    simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=1., iters=args.num_iters)
+    res = minimize(simulator.simulate, w0, method='Nelder-Mead')
     print res
 
