@@ -75,16 +75,60 @@ def prob_function_sigmoid_rd(candidates, cand_available, inst, inst_rank, school
     cand_p /= cand_p.sum()
     return cand_p
 
-
+# ----------------------
+# UNDER EVALUATION ::::: 
+# ----------------------
+# RANK OF HIRING INSTITUTION
 def prob_function_sigmoid_rd_rh(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
     cand_p = np.zeros(len(candidates), dtype=float)
     for i, (candidate, candidate_rank) in enumerate(candidates):
         if cand_available[i]:
-            cand_p[i] = sigmoid(np.dot(weights, [1, inst_rank-candidate_rank, inst_rank]))
+            cand_p[i] = sigmoid(np.dot(weights, [1, 
+                                                 inst_rank-candidate_rank,
+                                                 inst_rank]))
     cand_p /= cand_p.sum()
     return cand_p
 
 
+# GEOGRAPHY
+def prob_function_sigmoid_rd_gg(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+    print 'geo'
+    job_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
+    cand_p = np.zeros(len(candidates), dtype=float)
+    for i, (candidate, candidate_rank) in enumerate(candidates):
+        if cand_available[i]:
+            cand_p[i] = sigmoid(np.dot(weights, [1, 
+                                                 inst_rank-candidate_rank,
+                                                 int(job_region == candidate.phd_region)]))
+    cand_p /= cand_p.sum()
+    return cand_p
+
+
+# PRODUCTIVITY
+def prob_function_sigmoid_rd_pr(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+    cand_p = np.zeros(len(candidates), dtype=float)
+    for i, (candidate, candidate_rank) in enumerate(candidates):
+        if cand_available[i]:
+            print i 
+            cand_p[i] = sigmoid(np.dot(weights, [1, 
+                                                 inst_rank-candidate_rank,
+                                                 candidate.dblp_z]))
+    cand_p /= cand_p.sum()
+    return cand_p
+
+# POSTDOC
+def prob_function_sigmoid_rd_pd(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+    cand_p = np.zeros(len(candidates), dtype=float)
+    for i, (candidate, candidate_rank) in enumerate(candidates):
+        if cand_available[i]:
+            cand_p[i] = sigmoid(np.dot(weights, [1, 
+                                                 inst_rank-candidate_rank,
+                                                 int(candidate.has_postdoc)]))
+    cand_p /= cand_p.sum()
+    return cand_p
+
+
+""" # MAYBE THIS CAN BE DELETED...
 def prob_function_sigmoid_rd_rh_gg(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
     cand_p = np.zeros(len(candidates), dtype=float)
     job_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
@@ -97,17 +141,29 @@ def prob_function_sigmoid_rd_rh_gg(candidates, cand_available, inst, inst_rank, 
     cand_p /= cand_p.sum()
     return cand_p
 
+    LENGEND FOR FUNCTION NAMES
+    - rd: difference in rank between phd and first job (job-phd)
+    - rh: rank of hiring institution
+    - gg: geography
+    - pr: productivity
+    - pd: has post-doctoral experience
+    - gd: is female 
+"""
 
 # Provide easy access to the functions above.
 default_weights = {'step'     : [],
                    'rd'       : [-1.68965263, -5.94514355],
-                   'rd_rh'    : [-1.68965263, -5.94514355, -2.0101010101010101],
-                   'rd_rh_gg' : [-1.68965263, -5.94514355, -2.01010, 2.0101010]}
+                   'rd_rh'    : [-1.68965263, -5.94514355, 1.],
+                   'rd_gg'    : [-1.68965263, -5.94514355, 1.],
+                   'rd_pr'    : [-1.68965263, -5.94514355, 1.],
+                   'rd_pd'    : [-1.68965263, -5.94514355, 1.]}
 
 prob_functions = {'step'      : prob_function_step_function,
                   'rd'        : prob_function_sigmoid_rd,
-                  'rd_rh'     : prob_function_sigmoid_rd_rh,
-                  'rd_rh_gg'  : prob_function_sigmoid_rd_rh_gg}
+                  'rd_rh'     : prob_function_sigmoid_rd_rh,  # rank hiring
+                  'rd_gg'     : prob_function_sigmoid_rd_gg,  # geography
+                  'rd_pr'     : prob_function_sigmoid_rd_pr,  # productivity 
+                  'rd_pd'     : prob_function_sigmoid_rd_pd}  # postdoc
 
 
 class SigmoidModel:

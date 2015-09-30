@@ -58,16 +58,17 @@ def parse_doc_topics_file(doc_topics_file):
     return doc_topics_dict
 
 
-def link_doc_topics(faculty, doc_topics_dict):
+def link_doc_topics(faculty, doc_topics_dict, just_dblp=True):
     for f in faculty:
         pub_tag = None
         
         if 'dblp' in f:
             pub_tag = f['dblp']
-        if 'gs' in f:
+
+        if not just_dblp and 'gs' in f:
             pub_tag = f['gs']
 
-        if pub_tag and pub_tag in doc_topics_dict:
+        if pub_tag in doc_topics_dict:
             f['topic_dist'] = doc_topics_dict[pub_tag]
 
 
@@ -94,8 +95,3 @@ if __name__=="__main__":
     link_doc_topics(faculty, doc_topics_dict)
     add_doc_topics_to_file(doc_topics_dict, args.faculty_file, args.output_file)
 
-    '''
-    for f in faculty:
-        if f['facultyName'].endswith('Clauset'):
-            print f['topic_dist'], f['gs']
-    ''' 

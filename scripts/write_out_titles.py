@@ -67,6 +67,7 @@ if __name__=="__main__":
         custom_words = [word_filter(w.strip(), [], lem) for w in open(args.custom_stops, 'rU')]
         stop_words += custom_words
 
+    written = 0
     for f in faculty:
         tag = None
         words = []
@@ -76,6 +77,7 @@ if __name__=="__main__":
             for pub in f['dblp_pubs']:
                 add_words_from_title(words, pub['title'], stop_words, lem)
             
+        '''  # Skip Google Scholar results... for now... 
         if 'gs_pubs' in f:
             tag = f['gs']
             if len(f['gs_pubs']) > 1500:
@@ -83,9 +85,15 @@ if __name__=="__main__":
                 continue 
             for pub in f['gs_pubs']:
                 add_words_from_title(words, pub['title'], stop_words, lem)
+        '''
             
-        output = open(os.path.join(args.output_dir, '%s.txt' % tag), 'w')
-        output.write(' '.join(words))
-        output.close()
-        print f['facultyName']
+        if tag is not None:
+            output = open(os.path.join(args.output_dir, '%s.txt' % tag), 'w')
+            output.write(' '.join(words))
+            output.close()
+            print written, f['facultyName']
+            written += 1
+    
+    print '%d files created.' % written
+            
     

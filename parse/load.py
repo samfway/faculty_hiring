@@ -72,16 +72,16 @@ def split_faculty_by_year(faculty, year_start, year_stop, year_step=1):
     return candidate_pools, job_pools, job_ranks, year_range
 
 
-def load_all_publications(faculty, dblp_dir, gs_dir):
+def load_all_publications(faculty, dblp_dir=None, gs_dir=None):
     """ Load all publication data into faculty records """ 
     for f in faculty:
-        if 'gs' in f:
+        if gs_dir and 'gs' in f:
             filename = os.path.join(gs_dir, GS_PKL % f['gs'])
             with open(filename,'rb') as fp:
                 f['gs_pubs'] = pickle.load(fp)
                 f['gs_stats'] = pickle.load(fp)
                 
-        if 'dblp' in f:
+        if dblp_dir and 'dblp' in f:
             filename = os.path.join(dblp_dir, DBLP_PKL % f['dblp'])
             with open(filename,'rb') as fp:
                 f['dblp_pubs'] = pickle.load(fp)
