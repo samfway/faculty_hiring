@@ -4,8 +4,9 @@
 # vim files
 *.swp
 
-# Data dir
+# Data dir / temp files
 data/
+scripts/model_fitting/OPT_*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
