@@ -92,7 +92,6 @@ def prob_function_sigmoid_rd_rh(candidates, cand_available, inst, inst_rank, sch
 
 # GEOGRAPHY
 def prob_function_sigmoid_rd_gg(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
-    print 'geo'
     job_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
     cand_p = np.zeros(len(candidates), dtype=float)
     for i, (candidate, candidate_rank) in enumerate(candidates):
@@ -109,7 +108,6 @@ def prob_function_sigmoid_rd_pr(candidates, cand_available, inst, inst_rank, sch
     cand_p = np.zeros(len(candidates), dtype=float)
     for i, (candidate, candidate_rank) in enumerate(candidates):
         if cand_available[i]:
-            print i 
             cand_p[i] = sigmoid(np.dot(weights, [1, 
                                                  inst_rank-candidate_rank,
                                                  candidate.dblp_z]))
