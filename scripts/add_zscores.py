@@ -42,7 +42,7 @@ def get_paper_counts_by_topic(faculty, max_papers=200):
         if 'dblp_pubs' in f:
             paper_count = 0
             for paper in f['dblp_pubs']:
-                if 'year' in paper and paper['year'] <= f.first_asst_job_year:
+                if 'year' in paper and paper['year'] <= f.first_asst_job_year + 1:
                     paper_count += 1
             f.first_asst_job_papers = paper_count
             dists[:,paper_count] += f['topic_dist']
@@ -88,6 +88,13 @@ def set_zscores(faculty, means, stds):
         else:
             z = (0. - means) / stds
             f.dblp_z = np.dot(z, default_topic_dist)
+        if f.facultyName == 'Aaron Clauset':
+            print f.first_asst_job_papers - means
+            #print means
+            print stds
+            #print f.dblp_z
+            print z
+            exit()
 
 
 def add_zscores_to_file(faculty, in_file, out_file):

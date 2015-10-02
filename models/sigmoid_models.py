@@ -126,6 +126,39 @@ def prob_function_sigmoid_rd_pd(candidates, cand_available, inst, inst_rank, sch
     return cand_p
 
 
+# EVERYTHING *EXCEPT* GENDER (RD, RH, PD, PR, GG)
+def prob_function_sigmoid_no_gd(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+    job_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
+    cand_p = np.zeros(len(candidates), dtype=float)
+    for i, (candidate, candidate_rank) in enumerate(candidates):
+        if cand_available[i]:
+            cand_p[i] = sigmoid(np.dot(weights, [1, 
+                                                 inst_rank-candidate_rank,
+                                                 inst_rank,
+                                                 int(candidate.has_postdoc),
+                                                 candidate.dblp_z,
+                                                 int(job_region == candidate.phd_region)]))
+    cand_p /= cand_p.sum()
+    return cand_p
+
+
+# EVERYTHING *INCLUDING* GENDER (RD, RH, PD, PR, GG, GD)
+def prob_function_sigmoid_all(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+    job_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
+    cand_p = np.zeros(len(candidates), dtype=float)
+    for i, (candidate, candidate_rank) in enumerate(candidates):
+        if cand_available[i]:
+            cand_p[i] = sigmoid(np.dot(weights, [1, 
+                                                 inst_rank-candidate_rank,
+                                                 inst_rank,
+                                                 int(candidate.has_postdoc),
+                                                 candidate.dblp_z,
+                                                 int(job_region == candidate.phd_region),
+                                                 int(candidate.is_female)]))
+    cand_p /= cand_p.sum()
+    return cand_p
+
+
 """ # MAYBE THIS CAN BE DELETED...
 def prob_function_sigmoid_rd_rh_gg(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
     cand_p = np.zeros(len(candidates), dtype=float)
@@ -146,6 +179,8 @@ def prob_function_sigmoid_rd_rh_gg(candidates, cand_available, inst, inst_rank, 
     - pr: productivity
     - pd: has post-doctoral experience
     - gd: is female 
+
+def prob_function_sigmoid_no_gd(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
 """
 
 # Provide easy access to the functions above.
@@ -154,14 +189,18 @@ default_weights = {'step'     : [],
                    'rd_rh'    : [-1.68965263, -5.94514355, 1.],
                    'rd_gg'    : [-1.68965263, -5.94514355, 1.],
                    'rd_pr'    : [-1.68965263, -5.94514355, 1.],
-                   'rd_pd'    : [-1.68965263, -5.94514355, 1.]}
+                   'rd_pd'    : [-1.68965263, -5.94514355, 1.],
+                   'no_gd'    : [1., 1., 1., 1., 1., 1.],
+                   'all'      : [1., 1., 1., 1., 1., 1., 1.]}
 
 prob_functions = {'step'      : prob_function_step_function,
                   'rd'        : prob_function_sigmoid_rd,
-                  'rd_rh'     : prob_function_sigmoid_rd_rh,  # rank hiring
-                  'rd_gg'     : prob_function_sigmoid_rd_gg,  # geography
-                  'rd_pr'     : prob_function_sigmoid_rd_pr,  # productivity 
-                  'rd_pd'     : prob_function_sigmoid_rd_pd}  # postdoc
+                  'rd_rh'     : prob_function_sigmoid_rd_rh, 
+                  'rd_gg'     : prob_function_sigmoid_rd_gg,
+                  'rd_pr'     : prob_function_sigmoid_rd_pr,
+                  'rd_pd'     : prob_function_sigmoid_rd_pd,
+                  'no_gd'     : prob_function_sigmoid_no_gd,
+                  'all'       : prob_function_sigmoid_all}     
 
 
 class SigmoidModel:

@@ -25,7 +25,7 @@ def interface():
     args.add_argument('-i', '--inst-file', help='Institutions file', required=True)
     args.add_argument('-p', '--prob-function', help='Candidate probability/matching function', required=True)
     args.add_argument('-n', '--num-iters', help='Number of iterations to est. error', default=100, type=int)
-    args.add_argument('-s', '--num-steps', help='Number of steps allowed', default=100, type=int)
+    args.add_argument('-s', '--num-steps', help='Number of steps allowed', default=50, type=int)
     args = args.parse_args()
     return args
 
@@ -42,8 +42,20 @@ if __name__=="__main__":
                                                                                   year_step=1)
 
     model = SigmoidModel(prob_function=args.prob_function)
-    w0 = 10*np.random.randn(model.num_weights())
-    simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=1., iters=args.num_iters)
+
+    # Find a decent starting place
+    simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=1e-4, iters=20)
+    w0 = None
+    best_error = np.inf
+    for i in xrange(args.num_steps):
+        wtemp = 200*(np.random.random(model.num_weights()) - 0.5)  # [-100, 100]
+        error = simulator.simulate(weights=wtemp)
+        if error < best_error:
+            w0 = wtemp.copy()
+            best_error = error
+
+    # Optimize from there
+    simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=1e-4, iters=args.num_iters)
     opt = {'maxiter':args.num_steps}
     res = minimize(simulator.simulate, w0, method='Nelder-Mead', options=opt)
     print res
