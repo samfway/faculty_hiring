@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 
 
 # CONSTANTS
+SINGLE_FIG_SIZE = (6,4)
 BAR_WIDTH = 0.6
 TICK_SIZE = 15
 XLABEL_PAD = 10
@@ -23,7 +24,9 @@ TITLE_SIZE = 16
 LEGEND_SIZE = 12
 LINE_WIDTH = 2
 LIGHT_COLOR = '0.8'
+LIGHT_COLOR_V = np.array([float(LIGHT_COLOR) for i in xrange(3)])
 DARK_COLOR = '0.4'
+DARK_COLOR_V = np.array([float(DARK_COLOR) for i in xrange(3)])
 MALE_COLOR = np.array([0.25490196, 0.41176471, 0.88235294])
 FEMALE_COLOR = np.array([1.,  0.36,  0.72])
 
