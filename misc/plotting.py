@@ -76,14 +76,15 @@ def plot_confusion_matrix(M, labels, ax, cmap=plt.cm.Blues, rng=None):
     
 
 def color_bp(bp, color):
-    c = np.array(color) * 0.5
+    ''' Helper function for making prettier boxplots '''
+    c = np.array(color) # * 0.5
     c = tuple(c)
 
     for x in bp['boxes']:
         plt.setp(x, color=c)
         x.set_facecolor(color)
     for x in bp['medians']:
-        plt.setp(x, color=c)
+        plt.setp(x, color='w')
     for x in bp['whiskers']:
         plt.setp(x, color=c)
     for x in bp['fliers']:
