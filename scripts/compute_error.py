@@ -19,13 +19,17 @@ from faculty_hiring.models.null_models import ConfigurationModel, BestFirstModel
 from faculty_hiring.models.sigmoid_models import SigmoidModel
 
 
+def allow_negatives(x):
+    return str(x)
+
+
 def interface():
     args = argparse.ArgumentParser()
     args.add_argument('-f', '--fac-file', help='Faculty file', required=True)
     args.add_argument('-i', '--inst-file', help='Institutions file', required=True)
     args.add_argument('-p', '--prob-function', help='Candidate probability/matching function', required=True)
     args.add_argument('-n', '--num-iters', help='Number of iterations to est. error', default=100, type=int)
-    args.add_argument('-w', '--weights', help='Model parameters (as comma-separated string)', default='')
+    args.add_argument('-w', '--weights', help='Model parameters (as comma-separated string)', type=allow_negatives)
     args = args.parse_args()
     return args
 
