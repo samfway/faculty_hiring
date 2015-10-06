@@ -43,11 +43,11 @@ def load_assistant_profs(faculty_fp, school_info=None, ranking='pi_rescaled'):
 def split_faculty_by_year(faculty, year_start, year_stop, year_step=1):
     """ Similar to load_hires_by_year, but instead it takes in a list
         of faculty and splits into candidate/job pools. """ 
-    year_range = np.arange(year_start, year_stop, year_step)
-    num_steps = len(year_range)
-    candidate_pools = [[] for year in xrange(num_steps - 1)]
-    job_pools = [[] for year in xrange(num_steps - 1)]
-    job_ranks = [[] for year in xrange(num_steps - 1)]
+    year_range = np.arange(year_start, year_stop+year_step, year_step)
+    num_steps = len(year_range) - 1  # Drop the last year
+    candidate_pools = [[] for year in xrange(num_steps)]
+    job_pools = [[] for year in xrange(num_steps)]
+    job_ranks = [[] for year in xrange(num_steps)]
     num_professors = len(faculty)
 
     fac = [(f.first_asst_job_year, f.first_asst_job_location, f) for f in faculty]
@@ -56,7 +56,7 @@ def split_faculty_by_year(faculty, year_start, year_stop, year_step=1):
     YEAR = 0; PLACE = 1 ; FACULTY = 2
 
     ptr = 0  # Index over the list of faculty
-    for i in xrange(num_steps-1):  # Index over the time bins
+    for i in xrange(num_steps):  # Index over the time bins
         start = year_range[i]
         stop = year_range[i+1]
         while ptr < num_professors:
