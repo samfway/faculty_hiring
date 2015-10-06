@@ -7,14 +7,9 @@ __maintainer__ = "Sam Way"
 __email__ = "samfway@gmail.com"
 __status__ = "Development"
 
-""" Functions to plot a confusion matrix (heat map) 
-"""
-
-import numpy as np
-import matplotlib.pyplot as plt
-
 
 # CONSTANTS
+import numpy as np
 SINGLE_FIG_SIZE = (6,4)
 BAR_WIDTH = 0.6
 TICK_SIZE = 15
@@ -27,8 +22,29 @@ LIGHT_COLOR = '0.8'
 LIGHT_COLOR_V = np.array([float(LIGHT_COLOR) for i in xrange(3)])
 DARK_COLOR = '0.4'
 DARK_COLOR_V = np.array([float(DARK_COLOR) for i in xrange(3)])
+ALMOST_BLACK = '0.125'
+ALMOST_BLACK_V = np.array([float(ALMOST_BLACK) for i in xrange(3)])
 MALE_COLOR = np.array([0.25490196, 0.41176471, 0.88235294])
-FEMALE_COLOR = np.array([1.,  0.36,  0.72])
+#FEMALE_COLOR = np.array([1.,  0.36,  0.72])
+#FEMALE_COLOR = np.array([ 0.33333333,  0.6745098 ,  0.93333333])
+FEMALE_COLOR = np.array([0.40254901960784313, 0.75274509803921569, 0.50254901960784313])
+
+
+# IMPORTS AND CONFIG
+from matplotlib import rcParams
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['Helvetica']
+rcParams['xtick.major.pad'] = '8'
+rcParams['axes.edgecolor']  = ALMOST_BLACK
+rcParams['axes.labelcolor'] = ALMOST_BLACK
+rcParams['lines.color']     = ALMOST_BLACK
+rcParams['text.color']      = ALMOST_BLACK 
+rcParams['xtick.color']     = ALMOST_BLACK 
+rcParams['ytick.color']     = ALMOST_BLACK 
+rcParams['text.color']      = ALMOST_BLACK 
+rcParams['text.color']      = ALMOST_BLACK 
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 
 def plot_confusion_matrix(M, labels, ax, cmap=plt.cm.Blues, rng=None):

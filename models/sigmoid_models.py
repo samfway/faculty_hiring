@@ -301,6 +301,11 @@ class SigmoidModel:
         self.weights = kwargs.get('weights', default_weights[self.prob_function_name])
 
     
+    def get_weights(self):
+        """ Return a copy of the weights """
+        return np.copy(self.weights) 
+
+
     def num_weights(self):
         """ How many weights in this model? """
         return len(self.weights)
