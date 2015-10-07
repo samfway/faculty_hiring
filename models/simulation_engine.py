@@ -28,6 +28,11 @@ class SimulationEngine:
         self.num_jobs = 0.
         for job_pool in job_pools:
             self.num_jobs += len(job_pool)
+
+
+    def get_model_weights(self):
+        """ Return a copy of the model weights for sanity reasons """ 
+        return self.model.get_weights()
     
     
     def simulate(self, weights=None):
@@ -61,15 +66,20 @@ class SimulationEngine:
         return total_error + l2_penalty 
 
 
-    def generate_network(self):
+    def generate_network(self, one_list=True):
         """ Generate a network (list of hires) using the 
             specified hiring model """ 
         all_hires = []
         for i in xrange(self.num_pools):
-            all_hires += self.model.simulate_hiring(self.candidate_pools[i],
+            hires = self.model.simulate_hiring(self.candidate_pools[i],
                                                     self.job_pools[i], 
                                                     self.job_ranks[i],
                                                     self.school_info,
                                                     **self.model_args)
+            if one_list:
+                all_hires += hires
+            else:
+                all_hires.append(hires)
+
         return all_hires
     
