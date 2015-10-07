@@ -75,6 +75,18 @@ def prob_function_sigmoid_rd(candidates, cand_available, inst, inst_rank, school
     cand_p /= cand_p.sum()
     return cand_p
 
+
+def prob_function_sigmoid_rd_gd(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+    cand_p = np.zeros(len(candidates), dtype=float)
+    for i, (candidate, candidate_rank) in enumerate(candidates):
+        if cand_available[i]:
+            cand_p[i] = sigmoid(np.dot(weights, [1, 
+                                                 inst_rank-candidate_rank,
+                                                 int(candidate.is_female)]))
+    cand_p /= cand_p.sum()
+    return cand_p
+
+
 # ----------------------
 # UNDER EVALUATION ::::: 
 # ----------------------
@@ -267,6 +279,7 @@ def prob_function_sigmoid_no_gd(candidates, cand_available, inst, inst_rank, sch
 # Provide easy access to the functions above.
 default_weights = {'step'           : [],
                    'rd'             : [-1.68965263, -5.94514355],
+                   'rd_gd'          : [1., 1., 1.],
                    'rd_rh'          : [-1.68965263, -5.94514355, 1.],
                    'rd_gg'          : [-1.68965263, -5.94514355, 1.],
                    'rd_pr'          : [-1.68965263, -5.94514355, 1.],
@@ -281,6 +294,7 @@ default_weights = {'step'           : [],
 
 prob_functions = {'step'           : prob_function_step_function,
                   'rd'             : prob_function_sigmoid_rd,
+                  'rd_gd'          : prob_function_sigmoid_rd_gd,
                   'rd_rh'          : prob_function_sigmoid_rd_rh, 
                   'rd_gg'          : prob_function_sigmoid_rd_gg,
                   'rd_pr'          : prob_function_sigmoid_rd_pr,

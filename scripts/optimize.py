@@ -55,7 +55,7 @@ if __name__=="__main__":
             best_error = error
 
     # Optimize from there
-    simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=1e-4, iters=args.num_iters)
+    simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=1e-3, iters=args.num_iters)
     opt = {'maxiter':args.num_steps}
     res = minimize(simulator.simulate, w0, method='Nelder-Mead', options=opt)
     print res
