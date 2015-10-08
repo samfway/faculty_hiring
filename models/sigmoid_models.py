@@ -339,12 +339,14 @@ class SigmoidModel:
         job_p = job_ranks / job_ranks.sum()  # make probability
 
         # Match candidates to jobs
-        for j in xrange(num_jobs-1):
+        for j in xrange(num_jobs):
             # Select job to fill
             job_ind = np.random.multinomial(1, job_p).argmax()
             job_rank = job_ranks[job_ind]
             job_p[job_ind] = 0.  # mark as unavailable
-            job_p /= np.sum(job_p)  # renormalize
+            job_p_sum = np.sum(job_p)
+            if job_p_sum > 0.:  # jobs left?
+                job_p /= np.sum(job_p)  # renormalize
 
             # Match candidate to job
             cand_p = self.prob_function(candidates, cand_available, positions[job_ind], job_rank,
@@ -356,7 +358,7 @@ class SigmoidModel:
             
             # Remove the candidate from the pool
             cand_available[cand_ind] = 0
-
+        
         return hires
 
 
