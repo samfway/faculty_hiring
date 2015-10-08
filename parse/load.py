@@ -26,16 +26,16 @@ DBLP_PKL = 'DBLP_%s.pkl'
 def load_assistant_prof_pools(faculty_fp, school_info=None, ranking='pi_rescaled',
                               year_start=1970, year_stop=2012, year_step=1):
     """ Load all assistant professors, format as pools for simulation models """ 
-    assistant_professors = load_assistant_profs(faculty_fp, school_info, ranking)
+    assistant_professors = load_assistant_profs(faculty_fp, school_info, ranking, year_start, year_stop)
     return split_faculty_by_year(assistant_professors, year_start, year_stop, year_step)
 
 
-def load_assistant_profs(faculty_fp, school_info=None, ranking='pi_rescaled'):
+def load_assistant_profs(faculty_fp, school_info=None, ranking='pi_rescaled', year_start=1970, year_stop=2012):
     """ Return a list of the assistant professors """
     assistant_professors = []
     for f in parse_faculty_records(faculty_fp, school_info, ranking):
         place, year = f.first_asst_prof()
-        if year is not None and place is not None:
+        if year is not None and place is not None and year>=year_start and year<=year_stop:
             assistant_professors.append(f)
     return assistant_professors
 
