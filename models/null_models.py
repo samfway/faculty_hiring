@@ -30,7 +30,12 @@ NOISE_LEVEL = 1e-6
 class ConfigurationModel:
     def __init__(self):
         pass
+
+
+    def num_weights(self):
+        return 0  # There should really be a HiringModel class... To-do. 
     
+
     def simulate_hiring(self, candidates, positions, position_ranks, school_info, **kwargs):
         """ All candidates have an equal chance of being hired to each job """ 
         candidates_without_ranks = np.random.permutation([f[0] for f in candidates])
@@ -43,6 +48,11 @@ class ConfigurationModel:
 class BestFirstModel:
     def __init__(self):
         pass
+
+    
+    def num_weights(self):
+        return 0
+
 
     def simulate_hiring(self, candidates, positions, position_ranks, school_info, **kwargs):
         """ Simulate faculty hiring under the 'best-first' model.

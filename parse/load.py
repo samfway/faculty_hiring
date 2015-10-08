@@ -35,7 +35,7 @@ def load_assistant_profs(faculty_fp, school_info=None, ranking='pi_rescaled', ye
     assistant_professors = []
     for f in parse_faculty_records(faculty_fp, school_info, ranking):
         place, year = f.first_asst_prof()
-        if year is not None and place is not None and year>=year_start and year<=year_stop:
+        if year is not None and place is not None and year>=year_start and year<=year_stop and f.phd_location is not None:
             assistant_professors.append(f)
     return assistant_professors
 
