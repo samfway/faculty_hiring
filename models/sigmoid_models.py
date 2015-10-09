@@ -142,6 +142,20 @@ def prob_function_sigmoid_rd_pd(candidates, cand_available, inst, inst_rank, sch
 
 
 # PRODUCTIVITY + ??? 
+# + SELF-HIRING
+def prob_function_sigmoid_rd_pr_sh(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+    cand_p = np.zeros(len(candidates), dtype=float)
+    inst_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
+    for i, (candidate, candidate_rank) in enumerate(candidates):
+        if cand_available[i]:
+            cand_p[i] = sigmoid(np.dot(weights, [1, 
+                                                 inst_rank-candidate_rank,
+                                                 candidate.dblp_z,
+                                                 int(candidate.phd_region == inst_region)]))
+    cand_p /= cand_p.sum()
+    return cand_p
+
+
 # + RH
 def prob_function_sigmoid_rd_pr_rh(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
     cand_p = np.zeros(len(candidates), dtype=float)
@@ -267,6 +281,7 @@ def prob_function_sigmoid_rd_rh_gg(candidates, cand_available, inst, inst_rank, 
 
     LENGEND FOR FUNCTION NAMES
     - rd: difference in rank between phd and first job (job-phd)
+    - sh: self-hiring
     - rh: rank of hiring institution
     - gg: geography
     - pr: productivity
@@ -284,6 +299,7 @@ default_weights = {'step'           : [],
                    'rd_gg'          : [-1.68965263, -5.94514355, 1.],
                    'rd_pr'          : [-1.68965263, -5.94514355, 1.],
                    'rd_pd'          : [-1.68965263, -5.94514355, 1.],
+                   'rd_pr_sh'       : [1., 1., 1., 1.],
                    'rd_pr_rh'       : [1., 1., 1., 1.],
                    'rd_pr_pd'       : [1., 1., 1., 1.],
                    'rd_pr_gg'       : [1., 1., 1., 1.],
@@ -299,6 +315,7 @@ prob_functions = {'step'           : prob_function_step_function,
                   'rd_gg'          : prob_function_sigmoid_rd_gg,
                   'rd_pr'          : prob_function_sigmoid_rd_pr,
                   'rd_pd'          : prob_function_sigmoid_rd_pd,
+                  'rd_pr_sh'       : prob_function_sigmoid_rd_pr_sh,
                   'rd_pr_rh'       : prob_function_sigmoid_rd_pr_rh,
                   'rd_pr_pd'       : prob_function_sigmoid_rd_pr_pd,
                   'rd_pr_gg'       : prob_function_sigmoid_rd_pr_gg,
