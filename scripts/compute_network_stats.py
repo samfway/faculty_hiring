@@ -28,6 +28,7 @@ def interface():
     args.add_argument('-p', '--prob-function', help='Candidate probability/matching function', required=True)
     args.add_argument('-n', '--num-iters', help='Number of iterations to est. error', default=100, type=int)
     args.add_argument('-w', '--weights', help='Model parameters (as comma-separated string)')
+    args.add_argument('--actual', help='Compute network stats for the empirical network', action='store_true')
     args = args.parse_args()
     return args
 
@@ -114,7 +115,7 @@ def fraction_same_region(G, school_info, weight='weight'):
         s_region = school_info.get(s, school_info['UNKNOWN'])['Region']
         d_region = school_info.get(d, school_info['UNKNOWN'])['Region']
         total += G[s][d][weight]
-        if s == d:
+        if s_region == d_region:
             same += G[s][d][weight]
             
     return same/total
@@ -156,7 +157,17 @@ if __name__=="__main__":
                                                                                   year_stop=2012, 
                                                                                   year_step=1)
 
-    # Set up the model + simulator
+    # Compute actual stats, if requested.
+    if args.actual:
+        actual_hires = []
+        for pool in candidate_pools:
+            for person, rank in pool:
+                actual_hires.append((person, person.first_asst_job_location))
+        compute_network_stats(actual_hires, inst, output)
+        output.close()
+        exit()
+
+    # Otherwise, set up the model + simulator
     if args.prob_function == 'flat':
         # 'flat' could very easily be a prob_function in the sigmoid model -- this is faster
         model = ConfigurationModel()
