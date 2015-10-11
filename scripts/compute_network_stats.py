@@ -184,7 +184,7 @@ if __name__=="__main__":
 
     # Run however many iterations and compute stats
     for i in xrange(args.num_iters):
-        hires = simulator.generate_network(one_list=True)
+        hires = simulator.generate_network(weights=w, one_list=True)
         compute_network_stats(hires, inst, output)
 
     output.close()
