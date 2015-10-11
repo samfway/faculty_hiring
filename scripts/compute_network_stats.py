@@ -112,11 +112,12 @@ def fraction_same_region(G, school_info, weight='weight'):
     total = 0.
 
     for s,d in G.edges_iter():
-        s_region = school_info.get(s, school_info['UNKNOWN'])['Region']
-        d_region = school_info.get(d, school_info['UNKNOWN'])['Region']
-        total += G[s][d][weight]
-        if s_region == d_region:
-            same += G[s][d][weight]
+        if s in school_info and d in school_info:
+            s_region = school_info[s]['Region']
+            d_region = school_info[d]['Region']
+            total += G[s][d][weight]
+            if s_region == d_region:
+                same += G[s][d][weight]
             
     return same/total
 
