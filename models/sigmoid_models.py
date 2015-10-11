@@ -185,7 +185,7 @@ def prob_function_sigmoid_rd_pr_pd(candidates, cand_available, inst, inst_rank, 
 # + GG
 def prob_function_sigmoid_rd_pr_gg(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
     job_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
-    known_region = job_region != school_info['UNKNOWN'])['Region']
+    known_region = job_region != school_info['UNKNOWN']['Region']
     cand_p = np.zeros(len(candidates), dtype=float)
     for i, (candidate, candidate_rank) in enumerate(candidates):
         if cand_available[i]:
