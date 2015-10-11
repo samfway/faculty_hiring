@@ -13,8 +13,8 @@ import numpy as np
 
 def parse_phds_awarded(table_file):
     """ Returns graduation year, number of females, number total at doctoral level """
-    PHD_WOMEN_INDEX = 10
-    PHD_TOTAL_INDEX = 8
+    PHD_WOMEN_INDEX = 11
+    PHD_TOTAL_INDEX = 9
     YEAR_INDEX = 0
 
     years = []
@@ -26,7 +26,9 @@ def parse_phds_awarded(table_file):
         if not line or line.startswith('#'):
             continue
         pieces = line.split('\t')
-        if len(pieces) != 11:
+        if len(pieces) != 12:
+            print line
+            print pieces
             raise ValueError('Something went wrong!')
         
         year = int(pieces[YEAR_INDEX].split('-')[0])+1
