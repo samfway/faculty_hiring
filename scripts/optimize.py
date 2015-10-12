@@ -26,6 +26,7 @@ def interface():
     args.add_argument('-p', '--prob-function', help='Candidate probability/matching function', required=True)
     args.add_argument('-n', '--num-iters', help='Number of iterations to est. error', default=100, type=int)
     args.add_argument('-s', '--num-steps', help='Number of steps allowed', default=50, type=int)
+    args.add_argument('-r', '--reg', help='Regularization amount', default=1e-4, type=float)
     args = args.parse_args()
     return args
 
@@ -44,7 +45,7 @@ if __name__=="__main__":
     model = SigmoidModel(prob_function=args.prob_function)
 
     # Find a decent starting place
-    simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=1e-4, iters=20)
+    simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, args.reg, iters=20)
     w0 = None
     best_error = np.inf
     for i in xrange(args.num_steps):
