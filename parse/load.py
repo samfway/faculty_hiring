@@ -54,8 +54,6 @@ def split_faculty_by_year(faculty, year_start, year_stop, year_step=1):
     job_pools = [[] for year in xrange(num_steps)]
     job_ranks = [[] for year in xrange(num_steps)]
 
-    print len(faculty), year_start, year_stop
-
     for f in faculty:
         year = f.first_asst_job_year
         if year >= year_start and year < year_stop:
