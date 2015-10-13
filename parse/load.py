@@ -30,12 +30,17 @@ def load_assistant_prof_pools(faculty_fp, school_info=None, ranking='pi_rescaled
     return split_faculty_by_year(assistant_professors, year_start, year_stop, year_step)
 
 
-def load_assistant_profs(faculty_fp, school_info=None, ranking='pi_rescaled', year_start=1970, year_stop=2012):
+def load_assistant_profs(faculty_fp, school_info, ranking='pi_rescaled', year_start=1970, year_stop=2012):
     """ Return a list of the assistant professors """
     assistant_professors = []
     for f in parse_faculty_records(faculty_fp, school_info, ranking):
-        place, year = f.first_asst_prof()
-        if year is not None and place is not None and year>=year_start and year<=year_stop and f.phd_location is not None:
+        year = f.first_asst_job_year
+        if (year is not None and                          # We know their start year
+            year >= year_start and                        # It's in the range we want
+            year < year_stop and 
+            f.phd_location in school_info and             # Their PhD location is in-sample
+            f.first_asst_job_location in school_info and  # Their hiring location is in-sample
+            f.num_asst_jobs == f.num_asst_jobs_kd):       # It's clear which is the first gig
             assistant_professors.append(f)
     return assistant_professors
 
@@ -43,32 +48,24 @@ def load_assistant_profs(faculty_fp, school_info=None, ranking='pi_rescaled', ye
 def split_faculty_by_year(faculty, year_start, year_stop, year_step=1):
     """ Similar to load_hires_by_year, but instead it takes in a list
         of faculty and splits into candidate/job pools. """ 
-    year_range = np.arange(year_start, year_stop+year_step, year_step)
-    num_steps = len(year_range) - 1  # Drop the last year
+    year_range = np.arange(year_start, year_stop)
+    num_steps = len(year_range)
     candidate_pools = [[] for year in xrange(num_steps)]
     job_pools = [[] for year in xrange(num_steps)]
     job_ranks = [[] for year in xrange(num_steps)]
-    num_professors = len(faculty)
 
-    fac = [(f.first_asst_job_year, f.first_asst_job_location, f) for f in faculty]
-    fac.sort()
+    print len(faculty), year_start, year_stop
 
-    YEAR = 0; PLACE = 1 ; FACULTY = 2
-
-    ptr = 0  # Index over the list of faculty
-    for i in xrange(num_steps):  # Index over the time bins
-        start = year_range[i]
-        stop = year_range[i+1]
-        while ptr < num_professors:
-            if fac[ptr][YEAR] < stop: 
-                if fac[ptr][YEAR] >= start:
-                    job_pools[i].append(fac[ptr][PLACE])
-                    job_ranks[i].append(fac[ptr][FACULTY].first_asst_job_rank)
-                    candidate_pools[i].append((fac[ptr][FACULTY], f.phd_rank))
-                ptr += 1
-            else:
-                break  # Advance to next year range
-
+    for f in faculty:
+        year = f.first_asst_job_year
+        if year >= year_start and year < year_stop:
+            i = np.where(year_range == year)[0]
+            job_pools[i].append(f.first_asst_job_location)
+            job_ranks[i].append(f.first_asst_job_rank)
+            candidate_pools[i].append((f, f.phd_rank))
+        else:
+            print f.facultyName
+        
     return candidate_pools, job_pools, job_ranks, year_range
 
 
