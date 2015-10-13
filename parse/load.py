@@ -61,8 +61,6 @@ def split_faculty_by_year(faculty, year_start, year_stop, year_step=1):
             job_pools[i].append(f.first_asst_job_location)
             job_ranks[i].append(f.first_asst_job_rank)
             candidate_pools[i].append((f, f.phd_rank))
-        else:
-            print f.facultyName
         
     return candidate_pools, job_pools, job_ranks, year_range
 
