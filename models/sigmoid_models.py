@@ -104,7 +104,7 @@ def prob_function_sigmoid_rd_rh(candidates, cand_available, inst, inst_rank, sch
 
 # GEOGRAPHY
 def prob_function_sigmoid_rd_gg(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
-    job_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
+    job_region = school_info[inst]['Region']
     cand_p = np.zeros(len(candidates), dtype=float)
     for i, (candidate, candidate_rank) in enumerate(candidates):
         if cand_available[i]:
@@ -184,15 +184,14 @@ def prob_function_sigmoid_rd_pr_pd(candidates, cand_available, inst, inst_rank, 
 
 # + GG
 def prob_function_sigmoid_rd_pr_gg(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
-    job_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
-    known_region = job_region != school_info['UNKNOWN']['Region']
+    job_region = school_info[inst]['Region']
     cand_p = np.zeros(len(candidates), dtype=float)
     for i, (candidate, candidate_rank) in enumerate(candidates):
         if cand_available[i]:
             cand_p[i] = sigmoid(np.dot(weights, [1, 
                                                  inst_rank-candidate_rank,
                                                  candidate.dblp_z,
-                                                 int(known_region and job_region == candidate.phd_region)]))
+                                                 int(job_region == candidate.phd_region)]))
     cand_p /= cand_p.sum()
     return cand_p
 
@@ -203,7 +202,7 @@ def prob_function_sigmoid_rd_pr_gg(candidates, cand_available, inst, inst_rank, 
 # RD + PR + GG + ??? 
 # + PD
 def prob_function_sigmoid_rd_pr_gg_pd(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
-    job_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
+    job_region = school_info[inst]['Region']
     cand_p = np.zeros(len(candidates), dtype=float)
     for i, (candidate, candidate_rank) in enumerate(candidates):
         if cand_available[i]:
@@ -218,7 +217,7 @@ def prob_function_sigmoid_rd_pr_gg_pd(candidates, cand_available, inst, inst_ran
 
 # + RH
 def prob_function_sigmoid_rd_pr_gg_rh(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
-    job_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
+    job_region = school_info[inst]['Region']
     cand_p = np.zeros(len(candidates), dtype=float)
     for i, (candidate, candidate_rank) in enumerate(candidates):
         if cand_available[i]:
@@ -236,7 +235,7 @@ def prob_function_sigmoid_rd_pr_gg_rh(candidates, cand_available, inst, inst_ran
 
 # EVERYTHING *EXCEPT* GENDER (RD, RH, PD, PR, GG)
 def prob_function_sigmoid_no_gd(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
-    job_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
+    job_region = school_info[inst]['Region']
     cand_p = np.zeros(len(candidates), dtype=float)
     for i, (candidate, candidate_rank) in enumerate(candidates):
         if cand_available[i]:
@@ -252,7 +251,7 @@ def prob_function_sigmoid_no_gd(candidates, cand_available, inst, inst_rank, sch
 
 # EVERYTHING *INCLUDING* GENDER (RD, RH, PD, PR, GG, GD)
 def prob_function_sigmoid_all(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
-    job_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
+    job_region = school_info[inst]['Region']
     cand_p = np.zeros(len(candidates), dtype=float)
     for i, (candidate, candidate_rank) in enumerate(candidates):
         if cand_available[i]:
@@ -266,31 +265,6 @@ def prob_function_sigmoid_all(candidates, cand_available, inst, inst_rank, schoo
     cand_p /= cand_p.sum()
     return cand_p
 
-
-""" # MAYBE THIS CAN BE DELETED...
-def prob_function_sigmoid_rd_rh_gg(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
-    cand_p = np.zeros(len(candidates), dtype=float)
-    job_region = school_info.get(inst, school_info['UNKNOWN'])['Region']
-    for i, (candidate, candidate_rank) in enumerate(candidates):
-        if cand_available[i]:
-            cand_p[i] = sigmoid(np.dot(weights, [1, 
-                                                 inst_rank-candidate_rank,
-                                                 inst_rank,
-                                                 int(job_region == candidate.phd_region)]))
-    cand_p /= cand_p.sum()
-    return cand_p
-
-    LENGEND FOR FUNCTION NAMES
-    - rd: difference in rank between phd and first job (job-phd)
-    - sh: self-hiring
-    - rh: rank of hiring institution
-    - gg: geography
-    - pr: productivity
-    - pd: has post-doctoral experience
-    - gd: is female 
-
-def prob_function_sigmoid_no_gd(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
-"""
 
 # Provide easy access to the functions above.
 default_weights = {'step'           : [],

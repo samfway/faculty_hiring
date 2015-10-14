@@ -45,7 +45,7 @@ if __name__=="__main__":
     model = SigmoidModel(prob_function=args.prob_function)
 
     # Find a decent starting place
-    simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, args.reg, iters=20)
+    simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=args.reg, iters=20)
     w0 = None
     best_error = np.inf
     for i in xrange(args.num_steps):
@@ -56,7 +56,7 @@ if __name__=="__main__":
             best_error = error
 
     # Optimize from there
-    simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=1e-3, iters=args.num_iters)
+    simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=args.reg, iters=args.num_iters)
     opt = {'maxiter':args.num_steps}
     res = minimize(simulator.simulate, w0, method='Nelder-Mead', options=opt)
     print res
