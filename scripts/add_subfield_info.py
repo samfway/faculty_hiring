@@ -14,13 +14,15 @@ import re
 import os
 import numpy as np
 from faculty_hiring.parse.load import load_assistant_profs
+from faculty_hiring.parse import institution_parser
 
 
 def interface():
     args = argparse.ArgumentParser()
-    args.add_argument('-o', '--output-file', help='Output file')
-    args.add_argument('-i', '--faculty-file', help='Faculty profiles')
-    args.add_argument('-d', '--doc-topics-file', help='(cleaned) DBLP profile list')
+    args.add_argument('-o', '--output-file', help='Output faculty file')
+    args.add_argument('-f', '--faculty-file', help='Faculty profiles')
+    args.add_argument('-i', '--inst-file', help='Institution profiles')
+    args.add_argument('-d', '--doc-topics-file', help='Doc-topics from MALLET')
     args = args.parse_args()
     return args
 
@@ -90,7 +92,9 @@ def add_doc_topics_to_file(doc_topics_dict, input_file, output_file):
 if __name__=="__main__":
     args = interface()
     
-    faculty = load_assistant_profs(open(args.faculty_file, 'rU'))
+    inst = institution_parser.parse_institution_records(open(args.inst_file))
+    faculty = load_assistant_profs(open(args.faculty_file, 'rU'), inst)
+
     doc_topics_dict = parse_doc_topics_file(args.doc_topics_file)
     link_doc_topics(faculty, doc_topics_dict)
     add_doc_topics_to_file(doc_topics_dict, args.faculty_file, args.output_file)

@@ -20,7 +20,8 @@ from faculty_hiring.parse import load
 
 def interface():
     args = argparse.ArgumentParser()
-    args.add_argument('-i', '--faculty-file', help='Faculty profiles')
+    args.add_argument('-i', '--inst-file', help='Institution profiles')
+    args.add_argument('-f', '--faculty-file', help='Faculty profiles')
     args.add_argument('-o', '--output-file', help='Output faculty profiles')
     args.add_argument('-d', '--dblp-dir', help='DBLP dir')
     args = args.parse_args()
@@ -88,6 +89,7 @@ def set_zscores(faculty, means, stds):
         else:
             z = (0. - means) / stds
             f.dblp_z = np.dot(z, default_topic_dist)
+        '''
         if f.facultyName == 'Aaron Clauset':
             print f.first_asst_job_papers - means
             #print means
@@ -95,6 +97,7 @@ def set_zscores(faculty, means, stds):
             #print f.dblp_z
             print z
             exit()
+        ''' 
 
 
 def add_zscores_to_file(faculty, in_file, out_file):
@@ -133,7 +136,8 @@ def add_zscores_to_file(faculty, in_file, out_file):
 if __name__=="__main__":
     args = interface()
     
-    faculty = load_assistant_profs(open(args.faculty_file, 'rU'))
+    inst = institution_parser.parse_institution_records(open(args.inst_file))
+    faculty = load_assistant_profs(open(args.faculty_file, 'rU'), inst)
     load.load_all_publications(faculty, args.dblp_dir, gs_dir=None)
     dists, tots = get_paper_counts_by_topic(faculty)
     means, stds = get_topic_means_stds(dists, tots)

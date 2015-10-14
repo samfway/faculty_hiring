@@ -179,11 +179,16 @@ class faculty_record:
         self.first_asst_job_location = None
         self.first_asst_job_year = None
         year = np.inf
+        self.num_asst_jobs = 0     # Number of assistant jobs
+        self.num_asst_jobs_kd = 0  # With a known date
         for record in self.faculty:
             if record['rank'] == 'Assistant Professor':
-                if record['start_year'] and record['start_year'] < year:
-                    self.first_asst_job_location = record['place']
-                    self.first_asst_job_year = record['start_year']
+                self.num_asst_jobs += 1
+                if record['start_year']:
+                    self.num_asst_jobs_kd += 1
+                    if record['start_year'] < year:
+                        self.first_asst_job_location = record['place']
+                        self.first_asst_job_year = record['start_year']
 
         # Do they have a post-doc? 
         self.has_postdoc = False

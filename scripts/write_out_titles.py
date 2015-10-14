@@ -22,7 +22,8 @@ from nltk.corpus import stopwords
 def interface():
     args = argparse.ArgumentParser()
     args.add_argument('-o', '--output-dir', help='Output directory')
-    args.add_argument('-i', '--input-file', help='Input file')
+    args.add_argument('-i', '--inst-file', help='Inst file')
+    args.add_argument('-f', '--fac-file', help='Faculty file')
     args.add_argument('-d', '--dblp-dir', help='DBLP directory')
     args.add_argument('-g', '--gs-dir', help='GS directory')
     args.add_argument('-s', '--custom_stops', help='Custom stop words')
@@ -57,8 +58,8 @@ def add_words_from_title(words, title, stop_words, lem):
 
 if __name__=="__main__":
     args = interface()
-    
-    faculty = load.load_assistant_profs(open(args.input_file))
+    inst = institution_parser.parse_institution_records(open(args.inst_file))
+    faculty = load.load_assistant_profs(open(args.fac_file), inst)
     load.load_all_publications(faculty, args.dblp_dir, args.gs_dir)
 
     lem = WordNetLemmatizer()
