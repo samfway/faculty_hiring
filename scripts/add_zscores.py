@@ -141,6 +141,8 @@ if __name__=="__main__":
     load.load_all_publications(faculty, args.dblp_dir, gs_dir=None)
     dists, tots = get_paper_counts_by_topic(faculty)
     means, stds = get_topic_means_stds(dists, tots)
-    set_zscores(faculty, means, stds)
-    add_zscores_to_file(faculty, args.faculty_file, args.output_file)
+    print means
+    print stds
+    #set_zscores(faculty, means, stds)
+    #add_zscores_to_file(faculty, args.faculty_file, args.output_file)
 
