@@ -26,7 +26,7 @@ def interface():
     args.add_argument('-p', '--prob-function', help='Candidate probability/matching function', required=True)
     args.add_argument('-n', '--num-iters', help='Number of iterations to est. error', default=100, type=int)
     args.add_argument('-s', '--num-steps', help='Number of steps allowed', default=50, type=int)
-    args.add_argument('-r', '--reg', help='Regularization amount', default=1e-4, type=float)
+    args.add_argument('-r', '--reg', help='Regularization amount', default=1e-6, type=float)
     args = args.parse_args()
     return args
 

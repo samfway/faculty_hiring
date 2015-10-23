@@ -47,9 +47,10 @@ class SimulationEngine:
             self.model.weights = weights
 
         if self.regularization > 0.:
-            l2_penalty = np.dot(self.model.weights[1:], self.model.weights[1:]) * self.regularization
+            #penalty = np.dot(self.model.weights[1:], self.model.weights[1:]) * self.regularization  # L2
+            penalty = np.sum(np.abs(self.model.weights[1:]) * self.regularization)  # L1
         else:
-            l2_penalty = 0.0
+            penalty = 0.0
 
         for t in xrange(self.iterations):
             for i in xrange(self.num_pools):
@@ -62,9 +63,9 @@ class SimulationEngine:
         total_error /= (self.iterations * self.num_jobs)
 
         if not quiet:
-            print weights, '%.2f \t %.2f' % (total_error, total_error + l2_penalty)
+            print weights, '%.2f \t %.2f' % (total_error, total_error + penalty)
 
-        return total_error + l2_penalty 
+        return total_error + penalty 
 
 
     def generate_network(self, weights=None, one_list=True):

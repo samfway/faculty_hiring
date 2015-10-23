@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N OPT_all
+#PBS -N OPT_all_L1
 #PBS -joe
 #PBS -t 0-499
 #PBS -q long8gb
@@ -8,6 +8,6 @@
 #PBS -l walltime=47:59:59
 FINAL_DIR=/Users/sawa6416/Projects/faculty_hiring/optimization_output/results_files/
 OUTPUT_DIR=/scratch/Users/sawa6416/optimization_output
-TAG=all
+TAG=all_L1
 
 /Users/sawa6416/Projects/faculty_hiring/scripts/optimize.py -i /Users/sawa6416/Projects/faculty_hiring/data/inst_cs.txt -f /Users/sawa6416/Projects/faculty_hiring/data/faculty_cs_CURRENT.txt -p "all" > ${OUTPUT_DIR}/OPT_${TAG}_${PBS_ARRAYID}.txt

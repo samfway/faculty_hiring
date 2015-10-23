@@ -76,6 +76,37 @@ def prob_function_sigmoid_rd(candidates, cand_available, inst, inst_rank, school
     return cand_p
 
 
+def prob_function_sigmoid_gg(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+    job_region = school_info[inst]['Region']
+    cand_p = np.zeros(len(candidates), dtype=float)
+    for i, (candidate, candidate_rank) in enumerate(candidates):
+        if cand_available[i]:
+            cand_p[i] = sigmoid(np.dot(weights, [1, 
+                                                 int(job_region == candidate.phd_region)]))
+    cand_p /= cand_p.sum()
+    return cand_p
+
+
+def prob_function_sigmoid_pr(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+    cand_p = np.zeros(len(candidates), dtype=float)
+    for i, (candidate, candidate_rank) in enumerate(candidates):
+        if cand_available[i]:
+            cand_p[i] = sigmoid(np.dot(weights, [1, 
+                                                 candidate.dblp_z]))
+    cand_p /= cand_p.sum()
+    return cand_p
+
+
+def prob_function_sigmoid_pd(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+    cand_p = np.zeros(len(candidates), dtype=float)
+    for i, (candidate, candidate_rank) in enumerate(candidates):
+        if cand_available[i]:
+            cand_p[i] = sigmoid(np.dot(weights, [1, 
+                                                 int(candidate.has_postdoc)]))
+    cand_p /= cand_p.sum()
+    return cand_p
+
+
 def prob_function_sigmoid_rd_gd(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
     cand_p = np.zeros(len(candidates), dtype=float)
     for i, (candidate, candidate_rank) in enumerate(candidates):
@@ -197,6 +228,33 @@ def prob_function_sigmoid_rd_pr_gg(candidates, cand_available, inst, inst_rank, 
 
 
 # -------------------------------------------------------------------------------------------------------------
+# + RH
+def prob_function_sigmoid_rd_pr_rh_gg(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+    job_region = school_info[inst]['Region']
+    cand_p = np.zeros(len(candidates), dtype=float)
+    for i, (candidate, candidate_rank) in enumerate(candidates):
+        if cand_available[i]:
+            cand_p[i] = sigmoid(np.dot(weights, [1, 
+                                                 inst_rank-candidate_rank,
+                                                 candidate.dblp_z,
+                                                 inst_rank, 
+                                                 int(job_region == candidate.phd_region)]))
+    cand_p /= cand_p.sum()
+    return cand_p
+
+
+def prob_function_sigmoid_rd_pr_rh_pd(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+    cand_p = np.zeros(len(candidates), dtype=float)
+    for i, (candidate, candidate_rank) in enumerate(candidates):
+        if cand_available[i]:
+            cand_p[i] = sigmoid(np.dot(weights, [1, 
+                                                 inst_rank-candidate_rank,
+                                                 candidate.dblp_z,
+                                                 inst_rank, 
+                                                 int(candidate.has_postdoc)]))
+    cand_p /= cand_p.sum()
+    return cand_p
+
 
 
 # RD + PR + GG + ??? 
@@ -269,6 +327,9 @@ def prob_function_sigmoid_all(candidates, cand_available, inst, inst_rank, schoo
 # Provide easy access to the functions above.
 default_weights = {'step'           : [],
                    'rd'             : [-1.68965263, -5.94514355],
+                   'gg'             : [-1.68965263, -5.94514355],
+                   'pr'             : [-1.68965263, -5.94514355],
+                   'pd'             : [-1.68965263, -5.94514355],
                    'rd_gd'          : [1., 1., 1.],
                    'rd_rh'          : [-1.68965263, -5.94514355, 1.],
                    'rd_gg'          : [-1.68965263, -5.94514355, 1.],
@@ -280,11 +341,16 @@ default_weights = {'step'           : [],
                    'rd_pr_gg'       : [1., 1., 1., 1.],
                    'rd_pr_gg_rh'    : [1., 1., 1., 1., 1.],
                    'rd_pr_gg_pd'    : [1., 1., 1., 1., 1.],
+                   'rd_pr_rh_gg'    : [1., 1., 1., 1., 1.],
+                   'rd_pr_rh_pd'    : [1., 1., 1., 1., 1.],
                    'no_gd'          : [1., 1., 1., 1., 1., 1.],
                    'all'            : [1., 1., 1., 1., 1., 1., 1.]}
 
 prob_functions = {'step'           : prob_function_step_function,
                   'rd'             : prob_function_sigmoid_rd,
+                  'gg'             : prob_function_sigmoid_gg,
+                  'pr'             : prob_function_sigmoid_pr,
+                  'pd'             : prob_function_sigmoid_pd,
                   'rd_gd'          : prob_function_sigmoid_rd_gd,
                   'rd_rh'          : prob_function_sigmoid_rd_rh, 
                   'rd_gg'          : prob_function_sigmoid_rd_gg,
@@ -296,6 +362,8 @@ prob_functions = {'step'           : prob_function_step_function,
                   'rd_pr_gg'       : prob_function_sigmoid_rd_pr_gg,
                   'rd_pr_gg_rh'    : prob_function_sigmoid_rd_pr_gg_rh,
                   'rd_pr_gg_pd'    : prob_function_sigmoid_rd_pr_gg_pd,
+                  'rd_pr_rh_gg'    : prob_function_sigmoid_rd_pr_rh_gg,
+                  'rd_pr_rh_pd'    : prob_function_sigmoid_rd_pr_rh_pd,
                   'no_gd'          : prob_function_sigmoid_no_gd,
                   'all'            : prob_function_sigmoid_all}     
 
