@@ -122,6 +122,21 @@ def fraction_same_region(G, school_info, weight='weight'):
     return same/total
 
 
+def fraction_same_school(hires):
+    """ Computes the total number of reciprocated edges in the network...
+        ...ignoring weight (number of people exchanged)!
+    """
+    same = 0.
+    total = 0.
+
+    for person, place in hires:
+        if person.first_asst_job_location == place:
+            same += 1
+        total += 1
+            
+    return same/total
+
+
 def compute_network_stats(hires, school_info, output_fp):
     """ Given a list of hires, compute some stats, and write
         them out to the output file.
@@ -130,6 +145,8 @@ def compute_network_stats(hires, school_info, output_fp):
     Gu = G.to_undirected()
     Gcc = max(nx.connected_component_subgraphs(Gu), key=len)
 
+    # Fraction exact
+    output.write('%s:%f\n' % ('EXACT', fraction_same_school(hires)))
     # Size of the giant component
     output.write('%s:%d\n' % ('SIZE_GC', Gcc.number_of_nodes()))
     # Mean geodesic path length

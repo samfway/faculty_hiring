@@ -35,7 +35,7 @@ class SimulationEngine:
         return self.model.get_weights()
     
     
-    def simulate(self, weights=None, quiet=False):
+    def simulate(self, weights=None, quiet=False, ranking='pi'):
         """ Simulate hiring many times under the specified model.
             The returned error is the average squared placement error
             per individual in the dataset PLUS the L2-penalty term, 
@@ -59,11 +59,14 @@ class SimulationEngine:
                                                    self.job_ranks[i],
                                                    self.school_info,
                                                    **self.model_args)
-                total_error += sse_rank_diff(hires, self.school_info, 'pi')
+                total_error += sse_rank_diff(hires, self.school_info, ranking)
         total_error /= (self.iterations * self.num_jobs)
 
         if not quiet:
-            print weights, '%.2f \t %.2f' % (total_error, total_error + penalty)
+            if ranking == 'pi':
+                print weights, '%.2f \t %.2f' % (total_error, total_error + penalty)
+            else:
+                print weights, '%.6f \t %.6f' % (total_error, total_error + penalty)
 
         return total_error + penalty 
 

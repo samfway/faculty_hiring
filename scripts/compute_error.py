@@ -30,6 +30,7 @@ def interface():
     args.add_argument('-p', '--prob-function', help='Candidate probability/matching function', required=True)
     args.add_argument('-n', '--num-iters', help='Number of iterations to est. error', default=100, type=int)
     args.add_argument('-w', '--weights', help='Model parameters (as comma-separated string)', type=allow_negatives)
+    args.add_argument('-r', '--ranking', help='Which ranking to use', default='pi_rescaled')
     args = args.parse_args()
     return args
 
@@ -56,5 +57,5 @@ if __name__=="__main__":
         w = None
 
     for i in xrange(args.num_iters):
-        simulator.simulate(weights=w)
+        simulator.simulate(weights=w, ranking=args.ranking)
 
