@@ -373,8 +373,9 @@ class SigmoidModel:
         self.prob_function_name = kwargs.get('prob_function', 'step')
         self.prob_function = prob_functions[self.prob_function_name]
         self.weights = kwargs.get('weights', default_weights[self.prob_function_name])
-
+        self.power = kwargs.get('power', 1.0)
     
+
     def get_weights(self):
         """ Return a copy of the weights """
         return np.copy(self.weights) 
@@ -389,6 +390,7 @@ class SigmoidModel:
         """ Returns a list of person-place tuples (hires) """ 
         hires = []
         self.weights = kwargs.get('weights', self.weights)
+        self.power = kwargs.get('power', self.power)
 
         # Is the candidate available or not? 
         cand_available = np.ones(len(candidates))
@@ -397,6 +399,10 @@ class SigmoidModel:
         num_jobs = len(positions)
         job_ranks = np.array(position_ranks, dtype=float)
         job_p = job_ranks / job_ranks.sum()  # make probability
+
+        if self.power > 1:
+            job_p = job_p ** self.power
+            job_p /= job_p.sum() 
 
         # Match candidates to jobs
         for j in xrange(num_jobs):

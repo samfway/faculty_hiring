@@ -47,8 +47,8 @@ class SimulationEngine:
             self.model.weights = weights
 
         if self.regularization > 0.:
-            #penalty = np.dot(self.model.weights[1:], self.model.weights[1:]) * self.regularization  # L2
-            penalty = np.sum(np.abs(self.model.weights[1:]) * self.regularization)  # L1
+            penalty = np.dot(self.model.weights[1:], self.model.weights[1:]) * self.regularization  # L2
+            #penalty = np.sum(np.abs(self.model.weights[1:]) * self.regularization)  # L1
         else:
             penalty = 0.0
 
