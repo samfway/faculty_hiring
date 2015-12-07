@@ -24,9 +24,10 @@ def interface():
     args.add_argument('-f', '--fac-file', help='Faculty file', required=True)
     args.add_argument('-i', '--inst-file', help='Institutions file', required=True)
     args.add_argument('-p', '--prob-function', help='Candidate probability/matching function', required=True)
-    args.add_argument('-n', '--num-iters', help='Number of iterations to est. error', default=100, type=int)
-    args.add_argument('-s', '--num-steps', help='Number of steps allowed', default=50, type=int)
-    args.add_argument('-r', '--reg', help='Regularization amount', default=1e-6, type=float)
+    args.add_argument('-n', '--num-iters', help='Number of iterations to est. error', default=150, type=int)
+    args.add_argument('-s', '--num-steps', help='Number of steps allowed', default=100, type=int)
+    args.add_argument('-r', '--reg', help='Regularization amount', default=1e-10, type=float)
+    args.add_argument('-v', '--validation', help='Years to hold out', default='')
     args = args.parse_args()
     return args
 
@@ -42,6 +43,17 @@ if __name__=="__main__":
                                                                                   year_stop=2012, 
                                                                                   year_step=1)
 
+    if args.validation:  # if specified years are to be left out
+        hold_out = [int(year) for year in args.validation.split(',')]
+        training_candidates, training_jobs, training_job_ranks = [], [], []
+        for i, year in enumerate(year_range):
+            if year not in hold_out:
+                training_candidates.append(candidate_pools[i])
+                training_jobs.append(job_pools[i])
+                training_job_ranks.append(job_ranks[i])
+        # Overwrite originals 
+        candidate_pools, job_pools, job_ranks = training_candidates, training_jobs, training_job_ranks
+    
     model = SigmoidModel(prob_function=args.prob_function)
 
     # Find a decent starting place
@@ -49,7 +61,7 @@ if __name__=="__main__":
     w0 = None
     best_error = np.inf
     for i in xrange(args.num_steps):
-        wtemp = 200*(np.random.random(model.num_weights()) - 0.5)  # [-100, 100]
+        wtemp = 200*(np.random.random(model.num_weights()) - 0.5)  # ~[-100, 100]
         error = simulator.simulate(weights=wtemp)
         if error < best_error:
             w0 = wtemp.copy()
