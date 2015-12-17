@@ -31,6 +31,7 @@ def interface():
     args.add_argument('-n', '--num-iters', help='Number of iterations to est. error', default=100, type=int)
     args.add_argument('-w', '--weights', help='Model parameters (as comma-separated string)', type=allow_negatives)
     args.add_argument('-r', '--ranking', help='Which ranking to use', default='pi_rescaled')
+    args.add_argument('-v', '--validation', help='Years to hold out', default='')
     args = args.parse_args()
     return args
 
@@ -45,6 +46,17 @@ if __name__=="__main__":
                                                                                   year_start=1970, 
                                                                                   year_stop=2012, 
                                                                                   year_step=1)
+
+    if args.validation:  # if specified years are to be evaluated
+        hold_out = [int(year) for year in args.validation.split(',')]
+        testing_candidates, testing_jobs, testing_job_ranks = [], [], []
+        for i, year in enumerate(year_range):
+            if year in hold_out:
+                testing_candidates.append(candidate_pools[i])
+                testing_jobs.append(job_pools[i])
+                testing_job_ranks.append(job_ranks[i])
+        # Overwrite originals 
+        candidate_pools, job_pools, job_ranks = testing_candidates, testing_jobs, testing_job_ranks
 
     model = SigmoidModel(prob_function=args.prob_function)
     simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, iters=1, reg=0)

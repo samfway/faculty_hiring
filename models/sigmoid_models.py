@@ -400,6 +400,7 @@ class SigmoidModel:
         job_ranks = np.array(position_ranks, dtype=float)
         job_p = job_ranks / job_ranks.sum()  # make probability
 
+        # Original model, select job proportional to rank
         if self.power > 1:
             job_p = job_p ** self.power
             job_p /= job_p.sum() 
@@ -424,7 +425,26 @@ class SigmoidModel:
             
             # Remove the candidate from the pool
             cand_available[cand_ind] = 0
-        
+
+        ''' # NOTE: Hire in order according to rank:
+        sorted_jobs = np.argsort(job_p)[::-1]
+        for j in xrange(num_jobs):
+            # Select job to fill
+            job_ind = sorted_jobs[j]
+            job_rank = job_ranks[job_ind]
+
+            # Match candidate to job
+            cand_p = self.prob_function(candidates, cand_available, positions[job_ind], job_rank,
+                                        school_info, self.weights, **kwargs)
+            cand_ind = np.random.multinomial(1, cand_p).argmax()
+
+            # Log the hire
+            hires.append((candidates[cand_ind][0], positions[job_ind]))
+            
+            # Remove the candidate from the pool
+            cand_available[cand_ind] = 0
+        '''
+
         return hires
 
 
