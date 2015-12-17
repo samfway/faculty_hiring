@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 
 
 DBLP_FILE = 'DBLP_%s_file_0.html'
+PUB_TYPES = ['article', 'inproceedings', 'reference', 'informal']
 
 
 """
@@ -35,7 +36,7 @@ def parse_dblp_page(html_string):
             except:
                 pass
             if 'class' in li.attrs:
-                if li.attrs['class'][0] == 'entry':
+                if li.attrs['class'][0] == 'entry' and li.attrs['class'][1] in PUB_TYPES:
                     nav = li.findAll('nav', {'class':'publ'})[0]
                     head = nav.find('div', {'class':'head'})
                     link = head.find('a')
@@ -45,11 +46,27 @@ def parse_dblp_page(html_string):
                         link = None
 
                     pub_type = li.attrs['class'][1]
+                    authors = []
+                    for author_span in li.findAll('span', {'itemprop':'author'}):
+                        author = author_span.text
+                        author_tag = None
+                        link = author_span.find('a')
+                        if not link:
+                            if author_span.find('span', {'class':'this-person'}):
+                                author_tag = 'SELF'
+                        authors.append((author_tag, author))
+                        
+                        
                     authors = [a.text for a in li.findAll('span', {'itemprop':'author'})]
                     title = li.find('span', {'class':'title'}).text
+                    try:
+                        venue = li.find('span', {'itemprop':'isPartOf'}).text
+                    except:
+                        venue = None
 
-                    pub = dict(zip(['title', 'authors', 'link', 'pub_type', 'year'], 
-                                   [title, authors, link, pub_type, year]))
+                    pub = dict(zip(['title', 'authors', 'link', 'pub_type', 'venue', 'year'],
+                                   [title, authors, link, pub_type, venue, year]))
+
                     publications.append(pub)
 
     return publications, stats

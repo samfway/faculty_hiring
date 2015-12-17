@@ -58,7 +58,8 @@ import numpy as np
 
 NEW_RECORD_SYMBOL = ">>>"
 INDIVIDUAL_FIELDS = ['facultyName', 'email', 'sex', 'department', 
-                     'place', 'current', 'recordDate', 'gs', 'dblp', 'topic_dist', 'dblp_z']
+                     'place', 'current', 'recordDate', 'gs', 'dblp', 'topic_dist',
+                     'dblp_z', 'dblp_n', 'dblp_n_2011']
 EDUCATION_FIELDS = ['degree', 'place', 'field', 'years']
 FACULTY_FIELDS = ['rank', 'place', 'years']
 EDUCATION_FLAG = '[Education]'

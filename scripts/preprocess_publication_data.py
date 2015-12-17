@@ -10,6 +10,7 @@ __status__ = "Development"
 
 import os
 import argparse
+from faculty_hiring.parse import faculty_parser, institution_parser
 from faculty_hiring.parse.load import load_assistant_profs
 from faculty_hiring.parse.google_scholar import parse_gs_page
 from faculty_hiring.parse.dblp import parse_dblp_page
@@ -27,7 +28,8 @@ DBLP_PKL = 'DBLP_%s.pkl'
 
 def interface():
     args = argparse.ArgumentParser()
-    args.add_argument('-i', '--faculty-file', help='Faculty profiles')
+    args.add_argument('-i', '--inst-file', help='Institution profiles')
+    args.add_argument('-f', '--faculty-file', help='Faculty profiles')
     args.add_argument('-g', '--gs-dir', help='Directory of GS profiles')
     args.add_argument('-d', '--dblp-dir', help='Directory of DBLP profiles')
     args = args.parse_args()
@@ -36,15 +38,16 @@ def interface():
 
 if __name__=="__main__":
     args = interface()
-    faculty = load_assistant_profs(open(args.faculty_file, 'rU')) 
+    inst = institution_parser.parse_institution_records(open(args.inst_file))
+    faculty = load_assistant_profs(open(args.faculty_file), inst)
     num_processed = 0
 
     for f in faculty:
-        if f['facultyName'] != 'Aravind Srinivasan':
-            continue 
+        #if f['facultyName'] != 'Aravind Srinivasan':
+        #    continue 
 
         # Check for each profile, download if missing
-        if 'gs' in f:
+        if 'gs' in f and args.gs_dir is not None:
             num_loaded = 0
             gs_file = os.path.join(args.gs_dir, GS_FILE % (f['gs'], num_loaded))
             all_pubs = []
@@ -61,7 +64,7 @@ if __name__=="__main__":
                 pickle.dump(all_pubs, fp)
                 pickle.dump(stats, fp)
             
-        if 'dblp' in f:
+        if 'dblp' in f and args.dblp_dir is not None:
             dblp_file = os.path.join(args.dblp_dir, DBLP_FILE % (f['dblp'], 0))
             all_pubs, stats = parse_dblp_page(open(dblp_file).read())
             
