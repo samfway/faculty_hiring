@@ -63,6 +63,7 @@ class SigmoidModel:
             # Match candidate to job
             cand_p = self.prob_function(candidates, cand_available, positions[job_ind], job_rank,
                                         school_info, self.weights, **kwargs)
+            cand_p /= cand_p.sum()
             cand_ind = np.random.multinomial(1, cand_p).argmax()
 
             # Log the hire
