@@ -113,7 +113,6 @@ class SimulationEngine:
 
         likelihood = np.float128(0.)
         self.likelihoods = np.ones((self.num_pools, self.num_orders), dtype=np.float128)
-        #self.likelihoods = np.ones((self.num_pools, self.num_orders), dtype=float)
 
         for i in xrange(self.num_pools):
             F = np.zeros((self.pool_sizes[i], self.pool_sizes[i]), dtype=float)
@@ -121,12 +120,20 @@ class SimulationEngine:
                 self.model.score_candidates(F[j,:], self.candidate_pools[i], job, 
                                             self.job_ranks[i][j], self.school_info)
 
+            """ For each hiring sequence, calculate the likelihood, building up from the "final" hire.
+                That is, start with the last school to make a hire. There was only one candidate remaining
+                in the pool, so they chose them with probability 1. Go to the second-to-last. They chose 
+                from the last two candidates, and picked their hiring with probability equal to
+                    
+                    f(actual) / [f(actual) + f(not_hired)]. 
+
+                Build up this list until all hires have been accounted for. 
+            """
             for j in xrange(self.num_orders):
-                available = []
+                available = [] 
                 for k in xrange(F.shape[0]):
                     current = self.hiring_orders[i][j][-(k+1)]
                     available.append(current)
-                    self.likelihoods[i,j] *= F[current][current] / np.sum(F[current][available])
                     self.likelihoods[i,j] *= np.float128(F[current][current] / np.sum(F[current][available]))
 
         for j in xrange(self.num_orders):
