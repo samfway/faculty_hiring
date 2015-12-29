@@ -75,6 +75,14 @@ class SigmoidModel:
         return hires
 
 
+    def score_candidates(self, scores, candidates, job_place, job_rank, school_info, **kwargs):
+        """ Score a batch of candidates (for computing likelihood """ 
+        available = np.ones(len(candidates))
+        scores[:] = self.prob_function(candidates, available, job_place, job_rank,
+                                        school_info, self.weights, **kwargs)
+
+
+
 ''' # NOTE: Hire in order according to rank:
         sorted_jobs = np.argsort(job_p)[::-1]
         for j in xrange(num_jobs):

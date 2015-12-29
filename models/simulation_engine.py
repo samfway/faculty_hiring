@@ -14,7 +14,7 @@ from faculty_hiring.misc.scoring import sse_rank_diff
 
 class SimulationEngine:
     def __init__(self, candidate_pools, job_pools, job_ranks, school_info, model, 
-                 iters=10, reg=0., **kwargs):
+                 iters=10, reg=0., hiring_orders=None, hiring_probs=None, **kwargs):
         self.candidate_pools = candidate_pools
         self.job_pools = job_pools
         self.job_ranks = job_ranks
@@ -23,7 +23,17 @@ class SimulationEngine:
         self.model_args = kwargs
         self.iterations = iters
         self.regularization = reg
+        self.hiring_orders = hiring_orders
+        self.hiring_probs = hiring_probs
         self.num_pools = len(candidate_pools)
+   
+        if len(hiring_orders) != self.num_pools:
+            raise ValueError('Hiring orders must be the same size as hiring pools')
+
+        if self.hiring_orders is not None:
+            self.num_orders = len(self.hiring_orders[0])
+            self.pool_sizes = [len(self.hiring_orders[i][0]) for i in xrange(self.num_pools)]
+            self.likelihoods = np.ones((self.num_pools, self.num_orders), dtype=np.float128)
 
         self.num_jobs = 0.
         for job_pool in job_pools:
@@ -92,3 +102,40 @@ class SimulationEngine:
 
         return all_hires
     
+    
+    def calculate_neg_likelihood(self, weights=None):
+        """ Return the ***NEGATED*** likelihood of the model given the data (the hiring 
+            and candidate pools). Negated because this is getting passed into a function
+            minimizer, similar to the placement error calculation. 
+        """
+        if weights is not None:
+            self.model.weights = weights
+
+        likelihood = np.float128(0.)
+        self.likelihoods = np.ones((self.num_pools, self.num_orders), dtype=np.float128)
+        #self.likelihoods = np.ones((self.num_pools, self.num_orders), dtype=float)
+
+        for i in xrange(self.num_pools):
+            F = np.zeros((self.pool_sizes[i], self.pool_sizes[i]), dtype=float)
+            for j, job in enumerate(self.job_pools[i]):
+                self.model.score_candidates(F[j,:], self.candidate_pools[i], job, 
+                                            self.job_ranks[i][j], self.school_info)
+
+            for j in xrange(self.num_orders):
+                available = []
+                for k in xrange(F.shape[0]):
+                    current = self.hiring_orders[i][j][-(k+1)]
+                    available.append(current)
+                    self.likelihoods[i,j] *= F[current][current] / np.sum(F[current][available])
+                    self.likelihoods[i,j] *= np.float128(F[current][current] / np.sum(F[current][available]))
+
+        for j in xrange(self.num_orders):
+            ri_term = np.float128(1e100) #e1000)
+            for i in xrange(self.num_pools):
+                ri_term *= np.float128(self.likelihoods[i,j] * 1e100) * np.float128(self.hiring_probs[i][j] * 1e100)
+            likelihood += ri_term
+
+        print weights, likelihood,'\t', likelihood
+
+        return -likelihood
+
