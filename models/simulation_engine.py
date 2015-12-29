@@ -137,7 +137,7 @@ class SimulationEngine:
                     self.likelihoods[i,j] *= np.float128(F[current][current] / np.sum(F[current][available]))
 
         for j in xrange(self.num_orders):
-            ri_term = np.float128(1e100) #e1000)
+            ri_term = np.float128(1e100) 
             for i in xrange(self.num_pools):
                 ri_term *= np.float128(self.likelihoods[i,j] * 1e100) * np.float128(self.hiring_probs[i][j] * 1e100)
             likelihood += ri_term

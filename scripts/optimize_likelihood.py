@@ -82,10 +82,10 @@ if __name__=="__main__":
                                  hiring_orders=hiring_orders, hiring_probs=hiring_probs)
     opt = {'maxiter':args.num_steps}
 
-    if np.random.random() > 0.5:
-        method = 'Nelder-Mead'
-    else:
-        method = 'powell'
+    #if np.random.random() > 0.5:
+    method = 'Nelder-Mead'
+    #else:
+    #method = 'powell'
     print "OPTMETHOD: %s" % method
 
     res = minimize(simulator.calculate_neg_likelihood, w0, method=method, options=opt)
