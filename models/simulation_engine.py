@@ -34,6 +34,8 @@ class SimulationEngine:
             self.num_orders = len(self.hiring_orders[0])
             self.pool_sizes = [len(self.hiring_orders[i][0]) for i in xrange(self.num_pools)]
             self.likelihoods = np.ones((self.num_pools, self.num_orders), dtype=np.float128)
+            self.log_pr_y_ri = np.zeros(self.num_orders, dtype=np.float128)
+            self.log_pr_ri = np.sum(np.log(self.hiring_probs), axis=0)
 
         self.num_jobs = 0.
         for job_pool in job_pools:
@@ -112,7 +114,7 @@ class SimulationEngine:
             self.model.weights = weights
 
         likelihood = np.float128(0.)
-        self.likelihoods = np.ones((self.num_pools, self.num_orders), dtype=np.float128)
+        self.likelihoods[:] = 1.
 
         for i in xrange(self.num_pools):
             F = np.zeros((self.pool_sizes[i], self.pool_sizes[i]), dtype=float)
@@ -145,4 +147,35 @@ class SimulationEngine:
         print weights, likelihood,'\t', likelihood
 
         return -likelihood
+
+
+    def calculate_neg_log_likelihood(self, weights=None):
+        if weights is not None:
+            self.model.weights = weights
+
+        log_likelihood = 0.0
+
+        # log(Pr(Y,Ri)) = log(Pr(Y|Ri)) + log(Pr(R))
+        self.log_pr_y_ri[:] = self.log_pr_ri
+
+        for i in xrange(self.num_pools):
+            F = np.zeros((self.pool_sizes[i], self.pool_sizes[i]), dtype=float)
+            # Precompute all F scores
+            for j, job in enumerate(self.job_pools[i]):
+                self.model.score_candidates(F[j,:], self.candidate_pools[i], job, 
+                                            self.job_ranks[i][j], self.school_info)
+
+            for j in xrange(self.num_orders):
+                available = [] 
+                for k in xrange(F.shape[0]):
+                    current = self.hiring_orders[i][j][-(k+1)]
+                    available.append(current)
+                    self.log_pr_y_ri[j] += np.log(F[current][current] / np.sum(F[current][available])) 
+
+        # log of sum trick
+        log_likelihood = self.log_pr_y_ri[0] + np.log(np.sum(np.exp(self.log_pr_y_ri - self.log_pr_y_ri[0])))
+      
+        print weights, -log_likelihood,'\t',-log_likelihood 
+
+        return -log_likelihood
 

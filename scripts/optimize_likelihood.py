@@ -28,6 +28,7 @@ def interface():
     args.add_argument('-s', '--num-steps', help='Number of steps allowed', default=100, type=int)
     args.add_argument('-r', '--reg', help='Regularization amount', default=0., type=float)
     args.add_argument('-v', '--validation', help='Years to hold out', default='')
+    args.add_argument('-t', '--tolerance', help='Optimization tolerance', default=10.0, type=float)
     args = args.parse_args()
     return args
 
@@ -68,11 +69,11 @@ if __name__=="__main__":
     simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=args.reg,
                                  hiring_orders=hiring_orders, hiring_probs=hiring_probs)
     w0 = None
-    best_neg_likelihood = 0
+    best_neg_likelihood = np.inf
     for i in xrange(10): #args.num_steps):
-        wtemp = 100*np.random.randn(model.num_weights())  # ~[-100, 100]
-        #wtemp = 200*(np.random.random(model.num_weights()) - 0.5)  # ~[-100, 100]
-        temp = simulator.calculate_neg_likelihood(weights=wtemp)
+        #wtemp = 100*np.random.randn(model.num_weights())  # ~[-100, 100]
+        wtemp = 100*(np.random.random(model.num_weights()) - 0.5)  # ~[-100, 100]
+        temp = simulator.calculate_neg_log_likelihood(weights=wtemp)
         if temp < best_neg_likelihood:
             w0 = wtemp.copy()
             best_neg_likelihood = temp
@@ -81,13 +82,8 @@ if __name__=="__main__":
     simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=args.reg, 
                                  hiring_orders=hiring_orders, hiring_probs=hiring_probs)
     opt = {'maxiter':args.num_steps}
-
-    #if np.random.random() > 0.5:
     method = 'Nelder-Mead'
-    #else:
-    #method = 'powell'
-    print "OPTMETHOD: %s" % method
 
-    res = minimize(simulator.calculate_neg_likelihood, w0, method=method, options=opt)
+    res = minimize(simulator.calculate_neg_log_likelihood, w0, method=method, options=opt, tol=args.tolerance)
     print res
 
