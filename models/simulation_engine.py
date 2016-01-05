@@ -174,8 +174,13 @@ class SimulationEngine:
 
         # log of sum trick
         log_likelihood = self.log_pr_y_ri[0] + np.log(np.sum(np.exp(self.log_pr_y_ri - self.log_pr_y_ri[0])))
-      
-        print weights, -log_likelihood,'\t',-log_likelihood 
 
-        return -log_likelihood
+        if self.regularization > 0.:
+            penalty = np.dot(self.model.weights[1:], self.model.weights[1:]) * self.regularization  # L2
+        else:
+            penalty = 0.0
+      
+        print weights, -log_likelihood + penalty, '\t', -log_likelihood + penalty
+
+        return -log_likelihood + penalty
 
