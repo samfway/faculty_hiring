@@ -27,18 +27,11 @@ def interface():
     return args
 
 
-if __name__=="__main__":
-    args = interface()
-    grab_next = False
+def get_best_from_file(input_file, how_many):
+    """ Get the best function vals and corresponding weights from file """ 
     vals = []
-
-    if args.top_n < 0:
-        top_n = 10
-    else:
-        top_n = args.top_n
-    N = top_n - 2
-    
-    for line in open(args.input_file, 'rU'):
+    grab_next = False
+    for line in open(input_file, 'rU'):
         line = line.strip()
         if grab_next:
             found_end = '])' in line
@@ -56,23 +49,20 @@ if __name__=="__main__":
         elif line.startswith('fun:'):
             grab_next = True
             fun_val = float(line.split(': ')[1])
+    
+    return sorted(vals)[:how_many]
 
-    for i, v in enumerate(sorted(vals)):
+
+if __name__=="__main__":
+    args = interface()
+
+    if args.top_n < 0:
+        top_n = 10
+    else:
+        top_n = args.top_n
+    N = top_n - 2
+    
+    for i, v in enumerate(get_best_from_file(args.input_file, top_n)):
         print v[0], '\t', ','.join([str(x) for x in v[1]])
-        if i > N:
-            break
-        
     print 'Done!'
 
-'''
-9.87331896 -65.03930206 -44.85336366  45.78762739  15.50518665
- -53.27997179 -28.53989597] 4606.68      4606.68
-  status: 2
-    nfev: 268
- success: False
-     fun: 4594.3971985022745
-       x: array([-99.87332475, -65.03930134, -44.85336338,  45.78762597,
-        15.50518481, -53.27997003, -28.53990021])
- message: 'Maximum number of iterations has been exceeded.'
-     nit: 100
-'''
