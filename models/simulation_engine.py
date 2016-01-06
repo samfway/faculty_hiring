@@ -149,7 +149,7 @@ class SimulationEngine:
         return -likelihood
 
 
-    def calculate_neg_log_likelihood(self, weights=None):
+    def calculate_neg_log_likelihood(self, weights=None, verbose=True):
         if weights is not None:
             self.model.weights = weights
 
@@ -180,7 +180,8 @@ class SimulationEngine:
         else:
             penalty = 0.0
       
-        print weights, -log_likelihood + penalty, '\t', -log_likelihood + penalty
+        if verbose:
+            print weights, -log_likelihood + penalty, '\t', -log_likelihood + penalty
 
         return -log_likelihood + penalty
 
