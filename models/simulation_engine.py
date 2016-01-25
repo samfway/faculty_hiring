@@ -27,10 +27,9 @@ class SimulationEngine:
         self.hiring_probs = hiring_probs
         self.num_pools = len(candidate_pools)
    
-        if len(hiring_orders) != self.num_pools:
-            raise ValueError('Hiring orders must be the same size as hiring pools')
-
         if self.hiring_orders is not None:
+            if len(hiring_orders) != self.num_pools:
+                raise ValueError('Hiring orders must be the same size as hiring pools')
             self.num_orders = len(self.hiring_orders[0])
             self.pool_sizes = [len(self.hiring_orders[i][0]) for i in xrange(self.num_pools)]
             self.likelihoods = np.ones((self.num_pools, self.num_orders), dtype=np.float128)
