@@ -26,7 +26,7 @@ def interface():
     args.add_argument('-p', '--prob-function', help='Candidate probability/matching function', required=True)
     args.add_argument('-o', '--hiring-orders-file', help='Hiring order set file (pkl)', required=True)
     args.add_argument('-s', '--num-steps', help='Number of steps allowed', default=100, type=int)
-    args.add_argument('-r', '--reg', help='Regularization amount', default=0., type=float)
+    args.add_argument('-r', '--reg', help='Regularization amount', type=float, default=0.)
     args.add_argument('-v', '--validation', help='Years to hold out', default='')
     args.add_argument('-t', '--tolerance', help='Optimization tolerance', default=10.0, type=float)
     args = args.parse_args()
@@ -68,6 +68,7 @@ if __name__=="__main__":
     # Find a starting place
     simulator = SimulationEngine(candidate_pools, job_pools, job_ranks, inst, model, power=1, reg=args.reg,
                                  hiring_orders=hiring_orders, hiring_probs=hiring_probs)
+
     w0 = None
     best_neg_likelihood = np.inf
     for i in xrange(10): #args.num_steps):

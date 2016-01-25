@@ -185,3 +185,77 @@ class SimulationEngine:
 
         return -log_likelihood + penalty
 
+
+    def calculate_regvec_neg_log_likelihood(self, weights=None, verbose=True):
+        if weights is not None:
+            self.model.weights = weights
+
+        log_likelihood = 0.0
+
+        # log(Pr(Y,Ri)) = log(Pr(Y|Ri)) + log(Pr(R))
+        self.log_pr_y_ri[:] = self.log_pr_ri
+
+        for i in xrange(self.num_pools):
+            F = np.zeros((self.pool_sizes[i], self.pool_sizes[i]), dtype=float)
+            # Precompute all F scores
+            for j, job in enumerate(self.job_pools[i]):
+                self.model.score_candidates(F[j,:], self.candidate_pools[i], job, 
+                                            self.job_ranks[i][j], self.school_info)
+
+            for j in xrange(self.num_orders):
+                available = [] 
+                for k in xrange(F.shape[0]):
+                    current = self.hiring_orders[i][j][-(k+1)]
+                    available.append(current)
+                    self.log_pr_y_ri[j] += np.log(F[current][current] / np.sum(F[current][available])) 
+
+        # log of sum trick
+        log_likelihood = self.log_pr_y_ri[0] + np.log(np.sum(np.exp(self.log_pr_y_ri - self.log_pr_y_ri[0])))
+
+        if self.regularization > 0.:
+            penalty = np.dot(self.model.weights[1:], self.model.weights[1:]) * self.regularization  # L2
+        else:
+            penalty = 0.0
+      
+        if verbose:
+            print weights, -log_likelihood + penalty, '\t', -log_likelihood + penalty
+
+        return -log_likelihood + penalty
+
+
+    def calculate_self_hiring_rate(self, weights=None, verbose=True):
+        if weights is not None:
+            self.model.weights = weights
+
+        log_likelihood = 0.0
+
+        # log(Pr(Y,Ri)) = log(Pr(Y|Ri)) + log(Pr(R))
+        self.log_pr_y_ri[:] = self.log_pr_ri
+
+        for i in xrange(self.num_pools):
+            F = np.zeros((self.pool_sizes[i], self.pool_sizes[i]), dtype=float)
+            # Precompute all F scores
+            for j, job in enumerate(self.job_pools[i]):
+                self.model.score_candidates(F[j,:], self.candidate_pools[i], job, 
+                                            self.job_ranks[i][j], self.school_info)
+
+            for j in xrange(self.num_orders):
+                available = [] 
+                for k in xrange(F.shape[0]):
+                    current = self.hiring_orders[i][j][-(k+1)]
+                    available.append(current)
+                    self.log_pr_y_ri[j] += np.log(F[current][current] / np.sum(F[current][available])) 
+
+        # log of sum trick
+        log_likelihood = self.log_pr_y_ri[0] + np.log(np.sum(np.exp(self.log_pr_y_ri - self.log_pr_y_ri[0])))
+
+        if self.regularization > 0.:
+            penalty = np.dot(self.model.weights[1:], self.model.weights[1:]) * self.regularization  # L2
+        else:
+            penalty = 0.0
+      
+        if verbose:
+            print weights, -log_likelihood + penalty, '\t', -log_likelihood + penalty
+
+        return -log_likelihood + penalty
+
