@@ -22,6 +22,16 @@ def prob_function_step_function(candidates, cand_available, inst, inst_rank, sch
     return cand_p
 
 
+def prob_function_step_plus(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
+    cand_p = np.zeros(len(candidates), dtype=float)
+    cand_p[np.where(cand_available)] = 1e-9
+    for i, (candidate, candidate_rank) in enumerate(candidates):
+        if candidate_rank > inst_rank:
+            cand_p[i] = 1.
+    #cand_p /= cand_p.sum()
+    return cand_p
+
+
 def prob_function_sigmoid_rd(candidates, cand_available, inst, inst_rank, school_info, weights, **kwargs):
     cand_p = np.zeros(len(candidates), dtype=float)
     for i, (candidate, candidate_rank) in enumerate(candidates):
@@ -245,6 +255,7 @@ def prob_function_sigmoid_all(candidates, cand_available, inst, inst_rank, schoo
 
 # Provide easy access to the functions above.
 default_weights = {'step'           : [],
+                   'step+'          : [],
                    'rd'             : [1, 1],
                    'gg'             : [1, 1],
                    'pr'             : [1, 1],
@@ -254,7 +265,7 @@ default_weights = {'step'           : [],
                    'rd_gg'          : [1., 1., 1.],
                    'rd_pr'          : [1., 1., 1.],
                    'rd_pd'          : [1., 1., 1.],
-                   'rd_pr_rh'       : [1., 1., 1.],
+                   'rd_pr_rh'       : [1., 1., 1., 1.],
                    'rd_pr_pd'       : [1., 1., 1., 1.],
                    'rd_pr_gg'       : [1., 1., 1., 1.],
                    'rd_pr_gg_rh'    : [1., 1., 1., 1., 1.],
@@ -265,6 +276,7 @@ default_weights = {'step'           : [],
                    'all'            : [1., 1., 1., 1., 1., 1., 1.]}
 
 prob_functions = {'step'           : prob_function_step_function,
+                  'step+'          : prob_function_step_plus,
                   'rd'             : prob_function_sigmoid_rd,
                   'gg'             : prob_function_sigmoid_gg,
                   'pr'             : prob_function_sigmoid_pr,
