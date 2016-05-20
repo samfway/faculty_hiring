@@ -8,6 +8,7 @@ __email__ = "samfway@gmail.com"
 __status__ = "Development"
 
 
+''' # OLD TOPICS: 
 topic_descriptions = \
     ['Computer Architecture',
      'Image/Signal Processing',
@@ -19,5 +20,29 @@ topic_descriptions = \
      'Theory',
      'Computational Biology',
      'Programming Languages']
+'''
+
+
+topic_descriptions = ['robots',
+                      'security',
+                      'theory',
+                      'vision',
+                      'arch',
+                      'distributed',
+                      'data',
+                      'sensor nets',
+                      'software',
+                      'ml']
+
+longer_topic_descriptions = ['Robotics, HCI, Social Systems',
+                             'Security',
+                             'Theory',
+                             'Image/Signal Processing',
+                             'Computer Architecture',
+                             'Distributed Systems',
+                             'Data/Text Mining',
+                             'Sensor Networks/Telecom.',
+                             'Software Engineering',
+                             'Machine Learning'] 
 
 num_topics = len(topic_descriptions)

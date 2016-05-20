@@ -10,6 +10,7 @@ __status__ = "Development"
 
 import networkx as nx
 from numpy import array, zeros_like, mean
+import scipy as sp
 
 
 class Struct:
@@ -110,3 +111,18 @@ def compute_network_stats(G, inst):
     
     H = Gu.subgraph(keep)
     print 'MOD_REGION:%.5f' % (nx.attribute_assortativity_coefficient(H, 'region'))
+
+
+def binomial_confidence_interval(x, n, alpha):
+    """ Based on "Exact Binomial Confidence Interval for Proportions" by
+        Morisette and Khorram (1998).
+
+        The normal is often used to get confidence intervals for binomial random
+        variables. This can be OK, but falls apart when p is close to 0 or 1, or
+        if there aren't very many samples. In either case, we can use the exact
+        binomial confidence intervals.
+     """
+    lower = 1./(1. + ((n-x+1.)/x)*sp.stats.distributions.f.ppf(1.-alpha/2, 2.*(n-x+1), 2.*x))
+    temp = (x+1.)/(n-x)*sp.stats.distributions.f.ppf(1.-alpha/2, 2.*(x+1), 2.*(n-x))
+    upper = temp / (1.+temp)
+    return lower, upper

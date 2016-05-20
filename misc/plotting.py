@@ -28,24 +28,34 @@ MALE_COLOR = np.array([0.25490196, 0.41176471, 0.88235294])
 #FEMALE_COLOR = np.array([1.,  0.36,  0.72])
 #FEMALE_COLOR = np.array([ 0.33333333,  0.6745098 ,  0.93333333])
 FEMALE_COLOR = np.array([0.40254901960784313, 0.75274509803921569, 0.50254901960784313])
+ACCENT_COLOR_1 = np.array([255., 145., 48.]) / 255.  # Trump orange.
 
 
 # IMPORTS AND CONFIG
 from matplotlib import rcParams
-rcParams['font.family'] = 'sans-serif'
-rcParams['font.sans-serif'] = ['Helvetica']
+#rcParams['text.usetex'] = True #Let TeX do the typsetting
+#rcParams['pdf.use14corefonts'] = True
+#rcParams['ps.useafm'] = True
+#rcParams['text.latex.preamble'] = [r'\usepackage{sansmath}', r'\sansmath'] #Force sans-serif math mode (for axes labels)
+rcParams['font.family'] = 'sans-serif' # ... for regular text
+rcParams['font.sans-serif'] = ['Helvetica'] #, Avant Garde, Computer Modern Sans serif' # Choose a nice font here
+#rcParams['pdf.fonttype'] = 42
+#rcParams['ps.fonttype'] = 42
+
 rcParams['xtick.major.pad'] = '8'
 rcParams['axes.edgecolor']  = ALMOST_BLACK
 rcParams['axes.labelcolor'] = ALMOST_BLACK
 rcParams['lines.color']     = ALMOST_BLACK
-rcParams['text.color']      = ALMOST_BLACK 
 rcParams['xtick.color']     = ALMOST_BLACK 
 rcParams['ytick.color']     = ALMOST_BLACK 
 rcParams['text.color']      = ALMOST_BLACK 
-rcParams['text.color']      = ALMOST_BLACK 
+rcParams['lines.solid_capstyle'] = 'butt'
+
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
+#plt.rc('pdf',fonttype = 1)
+#plt.rc('ps',fonttype = 1)
 
 def plot_confusion_matrix(M, labels, ax, cmap=plt.cm.Blues, rng=None):
     """ Plot a confusion matrix on supplied axes. 
@@ -138,4 +148,12 @@ def hide_right_top_axis(ax):
     ax.get_yaxis().tick_left()
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
+
+
+def finalize(ax, fontsize=LABEL_SIZE, labelpad=7):
+    """ Make fonts bigger for publication """ 
+    hide_right_top_axis(ax)
+    ax.yaxis.label.set_size(fontsize)
+    ax.xaxis.label.set_size(fontsize)
+    ax.tick_params(axis='both', which='major', labelsize=fontsize, pad=labelpad)
 
