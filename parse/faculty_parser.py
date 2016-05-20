@@ -190,6 +190,7 @@ class faculty_record:
                     if record['start_year'] < year:
                         self.first_asst_job_location = record['place']
                         self.first_asst_job_year = record['start_year']
+                        year = self.first_asst_job_year
 
         # Do they have a post-doc? 
         self.has_postdoc = False
@@ -215,7 +216,7 @@ class faculty_record:
             else:
                 self.first_asst_job_rank = school_info['UNKNOWN'][ranking]
                 self.first_asst_job_region = school_info['UNKNOWN']['Region']
-        
+
 
     def phd(self):
         """ Return location + year of PhD """
