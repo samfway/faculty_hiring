@@ -54,6 +54,21 @@ rcParams['lines.solid_capstyle'] = 'butt'
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
+# Make a themed colormap
+r,g,b = ACCENT_COLOR_1
+cdict = {'red':   ((0.0,  1, 1),
+                   (0.5,  r, r),
+                   (1.0,  0, 0)),
+         'green': ((0.0,  1, 1),
+                   (0.5,  g, g),
+                   (1.0,  0, 0)),
+         'blue':  ((0.0,  1, 1),
+                   (0.5,  b, b),
+                   (1.0,  0, 0))}
+
+ACCENT_COLOR_1_CMAP = mpl.colors.LinearSegmentedColormap('testcmap', cdict)
+plt.register_cmap(cmap=ACCENT_COLOR_1_CMAP)
+
 #plt.rc('pdf',fonttype = 1)
 #plt.rc('ps',fonttype = 1)
 
@@ -152,6 +167,7 @@ def hide_right_top_axis(ax):
 
 def finalize(ax, fontsize=LABEL_SIZE, labelpad=7):
     """ Make fonts bigger for publication """ 
+    ax.tick_params(direction='out') 
     hide_right_top_axis(ax)
     ax.yaxis.label.set_size(fontsize)
     ax.xaxis.label.set_size(fontsize)
