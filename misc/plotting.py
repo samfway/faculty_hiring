@@ -39,8 +39,8 @@ from matplotlib import rcParams
 #rcParams['text.latex.preamble'] = [r'\usepackage{sansmath}', r'\sansmath'] #Force sans-serif math mode (for axes labels)
 rcParams['font.family'] = 'sans-serif' # ... for regular text
 rcParams['font.sans-serif'] = ['Helvetica'] #, Avant Garde, Computer Modern Sans serif' # Choose a nice font here
-#rcParams['pdf.fonttype'] = 42
-#rcParams['ps.fonttype'] = 42
+rcParams['pdf.fonttype'] = 42
+rcParams['ps.fonttype'] = 42
 
 rcParams['xtick.major.pad'] = '8'
 rcParams['axes.edgecolor']  = ALMOST_BLACK
@@ -53,6 +53,9 @@ rcParams['lines.solid_capstyle'] = 'butt'
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+
+# For making custom legends:
+from matplotlib.lines import Line2D
 
 # Make a themed colormap
 r,g,b = ACCENT_COLOR_1
