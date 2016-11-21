@@ -44,6 +44,9 @@ def download_dblp_page(dblp_url, output_prefix, page_number=0):
 
 if __name__=="__main__":
     args = interface()
+
+    print 'USE download_all.py INSTEAD!'
+    exit()
     
     output_prefix = os.path.join(args.output_dir, 'DBLP_')
     look_for = args.start_after  # Name to start after

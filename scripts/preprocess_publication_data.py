@@ -8,17 +8,19 @@ __email__ = "samfway@gmail.com"
 __status__ = "Development"
 
 
-import os
+import os, sys
 import argparse
 from faculty_hiring.parse import faculty_parser, institution_parser
 from faculty_hiring.parse.load import load_assistant_profs
 from faculty_hiring.parse.google_scholar import parse_gs_page
 from faculty_hiring.parse.dblp import parse_dblp_page
 try:
-   import cPickle as pickle
+    import cPickle as pickle
 except:
-   import pickle
+    import pickle
 
+
+sys.setrecursionlimit(1500)
 
 GS_FILE = 'GSP_%s_file_%d.html'
 GS_PKL = 'GSP_%s.pkl'
@@ -67,7 +69,7 @@ if __name__=="__main__":
         if 'dblp' in f and args.dblp_dir is not None:
             dblp_file = os.path.join(args.dblp_dir, DBLP_FILE % (f['dblp'], 0))
             all_pubs, stats = parse_dblp_page(open(dblp_file).read())
-            
+
             output_file = os.path.join(args.dblp_dir, DBLP_PKL % f['dblp']) 
             with open(output_file,'wb') as fp:
                 pickle.dump(all_pubs, fp)
