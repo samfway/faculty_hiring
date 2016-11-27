@@ -8,9 +8,11 @@ __email__ = "samfway@gmail.com"
 __status__ = "Development"
 
 
-import networkx as nx
 from numpy import array, zeros_like, mean
+from fuzzywuzzy import fuzz  # Fuzzy string matching for first/middle/last authorship detection
 import scipy as sp
+import numpy as np
+import networkx as nx
 
 
 class Struct:
@@ -126,3 +128,25 @@ def binomial_confidence_interval(x, n, alpha):
     temp = (x+1.)/(n-x)*sp.stats.distributions.f.ppf(1.-alpha/2, 2.*(x+1), 2.*(n-x))
     upper = temp / (1.+temp)
     return lower, upper
+
+
+#pub_types
+FAP = 0
+MAP = 1
+LAP = 2
+author_roles = ['First', 'Middle', 'Last']
+
+def get_author_role(faculty_name, author_list):
+    """ Detect author position from faculty name and the list of authors.
+    
+        Position type returned as a string: "first", "middle", or "last".
+    """
+    author_sim = [fuzz.ratio(faculty_name.lower(), name.lower()) for name in author_list]
+    position = np.argmax(author_sim)
+    if position == 0:
+        return FAP
+    elif position == len(author_sim) - 1:
+        return LAP
+    else:
+        return MAP
+    
