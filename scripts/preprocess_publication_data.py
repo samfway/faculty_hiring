@@ -14,13 +14,14 @@ from faculty_hiring.parse import faculty_parser, institution_parser
 from faculty_hiring.parse.load import load_assistant_profs
 from faculty_hiring.parse.google_scholar import parse_gs_page
 from faculty_hiring.parse.dblp import parse_dblp_page
+from faculty_hiring.misc.util import *
 try:
     import cPickle as pickle
 except:
     import pickle
 
 
-sys.setrecursionlimit(1500)
+sys.setrecursionlimit(5000)
 
 GS_FILE = 'GSP_%s_file_%d.html'
 GS_PKL = 'GSP_%s.pkl'
@@ -34,6 +35,7 @@ def interface():
     args.add_argument('-f', '--faculty-file', help='Faculty profiles')
     args.add_argument('-g', '--gs-dir', help='Directory of GS profiles')
     args.add_argument('-d', '--dblp-dir', help='Directory of DBLP profiles')
+    args.add_argument('-s', '--start-after', help='Skip past this person')
     args = args.parse_args()
     return args
 
@@ -43,8 +45,15 @@ if __name__=="__main__":
     inst = institution_parser.parse_institution_records(open(args.inst_file))
     faculty = load_assistant_profs(open(args.faculty_file), inst)
     num_processed = 0
+    skipping = args.start_after is not None
 
     for f in faculty:
+        if skipping:
+            if f.facultyName != args.start_after:
+                continue
+            else:
+                skipping = False
+
         #if f['facultyName'] != 'Aravind Srinivasan':
         #    continue 
 
@@ -69,6 +78,10 @@ if __name__=="__main__":
         if 'dblp' in f and args.dblp_dir is not None:
             dblp_file = os.path.join(args.dblp_dir, DBLP_FILE % (f['dblp'], 0))
             all_pubs, stats = parse_dblp_page(open(dblp_file).read())
+
+            for pub in all_pubs:
+                role = get_author_role(f.facultyName, pub['authors'])
+                pub['author_role'] = role
 
             output_file = os.path.join(args.dblp_dir, DBLP_PKL % f['dblp']) 
             with open(output_file,'wb') as fp:
