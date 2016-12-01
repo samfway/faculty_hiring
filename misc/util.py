@@ -15,6 +15,12 @@ import numpy as np
 import networkx as nx
 
 
+""" Utilities for inflation adjustments """ 
+AVG_PUBS_PER_YEAR_M = 0.0672849197909
+AVG_PUBS_PER_YEAR_B = -132.287090268
+inflation_adjust = lambda x: (2010*AVG_PUBS_PER_YEAR_M+AVG_PUBS_PER_YEAR_B)/(x*AVG_PUBS_PER_YEAR_M+AVG_PUBS_PER_YEAR_B)
+
+
 class Struct:
     """ Create a Python object from a dictionary of key-values """ 
     def __init__(self, **entries): 
