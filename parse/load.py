@@ -81,3 +81,20 @@ def load_all_publications(faculty, dblp_dir=None, gs_dir=None):
                 f['dblp_stats'] = pickle.load(fp)
 
 
+
+def convert_faculty_list_to_df(faculty, discipline=None):
+    data = []
+    fields = ['facultyName', 'first_asst_job_location', 'first_asst_job_year',
+             'has_postdoc', 'sex', 'num_asst_jobs', 'num_asst_jobs_kd', 
+             'phd_location', 'phd_year', 'place']
+    
+    for person in faculty:
+        person_data = [person[f] for f in fields]
+        if discipline is not None:
+            person_data.append(discipline)
+        data.append(person_data)
+        
+    if discipline is not None:
+        fields.append('discipline')
+        
+    return pd.DataFrame(data=data, columns=fields)
