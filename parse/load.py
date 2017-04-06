@@ -10,6 +10,7 @@ __status__ = "Development"
 
 import os
 import numpy as np
+import pandas as pd
 from faculty_hiring.parse.faculty_parser import parse_faculty_records
 from faculty_hiring.parse.dblp import parse_dblp_publications
 from faculty_hiring.parse.google_scholar import parse_gs_publications
